@@ -1,0 +1,186 @@
+##:kivy 1.10.0
+##:include screenone.kv
+##:include screentwo.kv
+##:include screenwelcome.kv
+
+# Use the above to import screen files
+
+
+
+<Manager>:
+    id: fuckeroni
+    screenwelcome: screen_welcome_id
+    screenadddevice: screen_Add_id
+    screenhome: screen_Home_id
+    screenaboutme: screen_AboutMe_id
+
+# The order below determines which screen is displayed after app loads
+
+
+    ScreenWelcome:
+        id: screen_welcome_id
+        name: 'ScreenWelcome'
+
+    ScreenAddDevice:
+        id: screen_Add_id
+        name: 'ScreenAdd'
+
+    ScreenHome:
+        id: screen_Home_id
+        name: "ScreenHome"
+
+    ScreenAboutMe:
+        id: screen_AboutMe_id
+        name: "ScreenAboutMe"
+
+    ScreenIOTControl:
+        id: screen_IOTControl_id
+        name: "ScreenIOTControl"
+
+
+
+<ScreenWelcome>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Welcome to the\n Star Tracker IOT APP'
+            size_hint_y: 0.9
+        Button:
+            halign: 'center'
+            size_hint_y: 0.1
+            text: "Continue!"
+            on_press:
+
+                root.manager.current = root.manager.splash_next
+                root.manager.last_screen = 'ScreenWelcome'
+
+            pos_hint: {"center_x": .5, "center_y": .5}
+
+
+
+<ScreenAddDevice>:
+
+    id: devices
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: "Star Tracker Add Device"
+            size_hint_y: 0.1
+        GridLayout:
+            id: addDevice_grid
+            padding: {0,80}
+            pos_hint_y: 0.5
+            size_hint_y: 0.8
+
+            cols: 2
+            Label:
+                text: "Name"
+            TextInput:
+                multiline: False
+                id: name
+            Label:
+                text: "Desc"
+            TextInput:
+                multiline: False
+                id: desc
+            Label:
+                text: "IP"
+            TextInput:
+                id: ip_id
+                multiline: False
+            Label:
+                text: "Device"
+            Button:
+                text: "Device Types"
+                id: dropdown_opener
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: 0.1
+            Button:
+
+                text: "Back"
+                on_press:
+                    root.manager.current = root.manager.last_screen
+                    root.manager.last_screen = "ScreenAdd"
+
+
+            Button:
+                text: "Continue"
+                on_press:
+                    root.Validate()
+                    # self.Validate()
+
+
+
+
+<ScreenHome>:
+    BoxLayout:
+        orientation: "vertical"
+        BoxLayout:
+            size_hint_y:0.9
+            orientation: 'vertical'
+            Label:
+                text: "Star Tracker Home"
+                size_hint_y: 0.1
+            # Cards go here - build a generator for them...
+            ScrollView:
+                pos_hint: {'center_x': .5}
+                size_hint_x: None
+                width: "400dp"
+
+                GridLayout:
+                    cols: 1
+                    size_hint_y:None
+                    height: self.minimum_height
+                    id: add_here
+
+
+
+
+        BoxLayout:
+            id: gimme
+            size_hint_y: 0.1
+            orientation: "horizontal"
+
+            Button:
+                text: "AddNew"
+                on_press:
+                    root.manager.last_screen = 'ScreenHome'
+                    root.manager.current = "ScreenAdd"
+            Button:
+                text: "Home"
+
+            Button:
+                text: "Me"
+                on_press:
+                    root.manager.last_screen = "ScreenHome"
+                    root.manager.current = "ScreenAboutMe"
+
+<ScreenIOTControl>:
+    BoxLayout:
+        BoxLayout:
+            id: gimme
+            size_hint_y: 0.1
+            orientation: "horizontal"
+
+            Button:
+                text: "AddNew"
+                on_press:
+                    root.manager.last_screen = 'ScreenHome'
+                    root.manager.current = "ScreenAdd"
+            Button:
+                text: "Home"
+
+            Button:
+                text: "Me"
+                on_press:
+                    root.manager.last_screen = "ScreenHome"
+                    root.manager.current = "ScreenAboutMe"
+
+<ScreenAboutMe>:
+    BoxLayout:
+        Button:
+            text: "WIP"
+            on_press:
+                root.manager.current = "ScreenHome"
