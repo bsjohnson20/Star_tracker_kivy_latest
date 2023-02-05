@@ -33,9 +33,12 @@ class ScreenAboutMe(Screen):
 
 
 class ScreenIOTControl(Screen):
-    def loadPage(self,*args,**kwargs):
-        caller_name = args[0]
-        devices_storage[caller_name]
+    def loadPage(self,name,dev_type,**kwargs):
+        # load the page for the device type and device name with the data and controls.
+        App.get_running_app().root.current = 'ScreenIOTControl'
+        # devices_storage[caller_name]
+        print(name, dev_type)
+
 
 
 class ScreenAddDevice(Screen):
@@ -119,7 +122,9 @@ class ScreenHome(Screen):
             x.add_widget(Label(text=devices_storage[item]['desc']))
             x.add_widget(Label(text="ip"))
             x.add_widget(Label(text=devices_storage[item]['ip']))
-            x.add_widget(Label(text="Device Type"))
+            dev_type = Label(text="Device Type")
+            # root.ids['dev_type'] = dev_type
+            x.add_widget(dev_type)
             x.add_widget(Label(text=devices_storage[item]['device_type']))
             x.anchor_x = 'center'
             x.anchor_y = 'center'
@@ -127,10 +132,11 @@ class ScreenHome(Screen):
             Box = BoxLayout(size_hint_y=None, center_x=0.5, center_y=0.5)
             Box.add_widget(x)
             OpenButton = Button(text="Open", size_hint_x=0.3)
-            OpenButton.bind(on_release=lambda x: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(item))
+            OpenButton.bind(on_release=lambda x: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(item, devices_storage[item]['device_type']))
             Box.add_widget(OpenButton)
             self.add_widget(Box)
-
+    def IOTOpener(self, device_type):
+        pass
 
 
 

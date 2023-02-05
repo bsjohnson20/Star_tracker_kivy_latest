@@ -13,6 +13,7 @@
     screenadddevice: screen_Add_id
     screenhome: screen_Home_id
     screenaboutme: screen_AboutMe_id
+    screeniotcontrol: screen_IOTControl_id
 
 # The order below determines which screen is displayed after app loads
 
@@ -165,18 +166,11 @@
             orientation: "horizontal"
 
             Button:
-                text: "AddNew"
-                on_press:
-                    root.manager.last_screen = 'ScreenHome'
-                    root.manager.current = "ScreenAdd"
+                text: "Back"
+                root.manager.current = "ScreenHome"
+                # we don't use last_Screen, as we dynamically generate it. ANd I can't be bothered making it even more path generated
             Button:
-                text: "Home"
-
             Button:
-                text: "Me"
-                on_press:
-                    root.manager.last_screen = "ScreenHome"
-                    root.manager.current = "ScreenAboutMe"
 
 <ScreenAboutMe>:
     BoxLayout:
