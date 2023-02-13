@@ -2,6 +2,8 @@ import weakref
 from IPy import IP
 from kivy.app import App
 from kivy.clock import Clock
+from kivy.uix.behaviors import ButtonBehavior
+from kivy.uix.image import Image
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
@@ -33,12 +35,11 @@ class ScreenAboutMe(Screen):
 
 
 class ScreenIOTControl(Screen):
-    def loadPage(self,name,dev_type,**kwargs):
+    def loadPage(self, name, dev_type, **kwargs):
         # load the page for the device type and device name with the data and controls.
         App.get_running_app().root.current = 'ScreenIOTControl'
         # devices_storage[caller_name]
         print(name, dev_type)
-
 
 
 class ScreenAddDevice(Screen):
@@ -52,7 +53,7 @@ class ScreenAddDevice(Screen):
     def Validate(self, *args, **kwargs):
         temp = App.get_running_app().root.ids.screen_Add_id.ids
         # Check if nothing inputted or item already in dict
-        if temp.ip_id.text == '' or temp.name.text == ''  or temp.name.text in devices_storage:
+        if temp.ip_id.text == '' or temp.name.text == '' or temp.name.text in devices_storage:
             box = BoxLayout(orientation="vertical")
             popup = Popup(title='Error', content=box, size_hint={0.4, 0.2})
             box.add_widget(Label(text="Missing data or already in database"))
@@ -61,29 +62,26 @@ class ScreenAddDevice(Screen):
         else:
             try:
                 IP(temp.ip_id.text)
-                devices_storage.put(temp.name.text, desc=temp.desc.text, ip=temp.ip_id.text,device_type=temp.dropdown_opener.text)
+                devices_storage.put(temp.name.text, desc=temp.desc.text, ip=temp.ip_id.text,
+                                    device_type=temp.dropdown_opener.text)
                 App.get_running_app().root.current = "ScreenHome"
                 App.get_running_app().root.ids.screen_Home_id.setup()
             except ValueError:
 
-                box=BoxLayout(orientation="vertical")
-                popup = Popup(title='Error', content=box,size_hint={0.4,0.2})
+                box = BoxLayout(orientation="vertical")
+                popup = Popup(title='Error', content=box, size_hint={0.4, 0.2})
                 box.add_widget(Label(text="Invalid IP"))
-                box.add_widget(Button(text="Close",on_press=popup.dismiss))
+                box.add_widget(Button(text="Close", on_press=popup.dismiss))
                 popup.open()
-
-
-
-
 
     def callback(self, text_item):
         print(text_item)
 
-    def assemble(self,*args):
+    def assemble(self, *args):
         print("Assembling STARTED")
         dropdown = DropDown()
 
-        device_types=[
+        device_types = [
             "StarTrackerV1",
             "StarTrackerv2",
             "StarTrackerV3"
@@ -97,11 +95,20 @@ class ScreenAddDevice(Screen):
         print(self.ids.dropdown_opener)
         dropdown.bind(on_select=lambda instance, x: setattr(self.ids.dropdown_opener, 'text', x))
 
+class OpenerButton(ButtonBehavior, Image):
+    # set image to resources/plus.png
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.source = 'resources/play.png'
+        self.size_hint = (None, None)
+        self.size = (50, 50)
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+
+
 
 class ScreenHome(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
 
     def setup(self):
         """
@@ -110,10 +117,10 @@ class ScreenHome(Screen):
         """
         self = App.get_running_app().root.ids.screen_Home_id.ids.add_here
 
-        for child in [child for child in self.children]: # clear screen - this lets us update the screen as well! - no this isn't a lazy workaround so I don't have to append instead... and write a new builder
+        for child in [child for child in
+                      self.children]:  # clear screen - this lets us update the screen as well! - no this isn't a lazy workaround so I don't have to append instead... and write a new builder
             self.remove_widget(child)
         for item in devices_storage:
-
             x = GridLayout(cols=2, size_hint_y=None, size_hint_x=0.7, center_x=0.5, center_y=0.5)
             # Setup labels with their respective data
             x.add_widget(Label(text="name"))
@@ -131,13 +138,31 @@ class ScreenHome(Screen):
             # create THE Box this'll contain labels and the buton to open the corresponding IOT panel
             Box = BoxLayout(size_hint_y=None, center_x=0.5, center_y=0.5)
             Box.add_widget(x)
-            OpenButton = Button(text="Open", size_hint_x=0.3)
-            OpenButton.bind(on_release=lambda x: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(item, devices_storage[item]['device_type']))
-            Box.add_widget(OpenButton)
+            # clickable image
+            # OpenerButton(on_release=lambda x: self.loadPage(item, devices_storage[item]['device_type']))
+            BigButton=OpenerButton()
+            BigButton.bind(on_release=lambda x: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(item,devices_storage[item]['device_type']))
+            # add OpenerButton to Box
+
+            Box.add_widget(BigButton)
+            # OpenButton = Button(text="Open", size_hint_x=0.3)
+
+            # create image inside button
+            # img = Image(source="resources/plus.png", size_hint_x=0.3, pos_hint={'center_x': OpenButton.center_x, 'center_y': OpenButton.center_y})
+            # img = Image(source="resources/plus.png", size_hint=(None, None), size=(50, 50))
+            # add img to OpenButton
+            # OpenButton.add_widget(img)
+            # add OpenButton to Box
+            # Box.add_widget(OpenButton)
+            # OpenButton.bind(on_release=lambda x: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(item,
+            #                                                                                                  devices_storage[
+             #                                                                                                     item][
+              #                                                                                                    'device_type']))
+
             self.add_widget(Box)
+
     def IOTOpener(self, device_type):
         pass
-
 
 
 class ScreenMain(Screen):
@@ -155,7 +180,10 @@ class LunaApp(MDApp):
     def build(self):
         """This method returns the Manager class"""
         self.theme_cls.theme_style = "Dark"
-        self.theme_cls.primary_palette = "Purple"  # "Purple", "Red"
+        # change colour of window to purple
+        Window.clearcolor = (1, 0, 0, 1)
+
+
         self.root = Manager()
         self.checkComplete()  # check if devices already present if so, skip add device screen!
         return self.root

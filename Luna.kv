@@ -5,6 +5,9 @@
 
 # Use the above to import screen files
 
+#<ContextButton@Button>:
+ #   size: 120, 40
+
 
 
 <Manager>:
@@ -160,6 +163,17 @@
 
 <ScreenIOTControl>:
     BoxLayout:
+        orientation: 'vertical'
+        # title
+        BoxLayout:
+            orientation: 'vertical'
+        # Info Screen
+        BoxLayout:
+            orientation: 'vertical'
+        # Control panel
+        BoxLayout:
+            orientation: 'vertical'
+        # Log Screen
         BoxLayout:
             id: gimme
             size_hint_y: 0.1
@@ -167,7 +181,8 @@
 
             Button:
                 text: "Back"
-                root.manager.current = "ScreenHome"
+                on_press:
+                    root.manager.current = "ScreenHome"
                 # we don't use last_Screen, as we dynamically generate it. ANd I can't be bothered making it even more path generated
             Button:
             Button:
