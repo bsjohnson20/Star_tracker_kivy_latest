@@ -95,6 +95,7 @@ class ScreenAddDevice(Screen):
         print(self.ids.dropdown_opener)
         dropdown.bind(on_select=lambda instance, x: setattr(self.ids.dropdown_opener, 'text', x))
 
+
 class OpenerButton(ButtonBehavior, Image):
     # set image to resources/plus.png
     def __init__(self, **kwargs):
@@ -103,7 +104,6 @@ class OpenerButton(ButtonBehavior, Image):
         self.size_hint = (None, None)
         self.size = (50, 50)
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
-
 
 
 class ScreenHome(Screen):
@@ -140,24 +140,14 @@ class ScreenHome(Screen):
             Box.add_widget(x)
             # clickable image
             # OpenerButton(on_release=lambda x: self.loadPage(item, devices_storage[item]['device_type']))
-            BigButton=OpenerButton()
-            BigButton.bind(on_release=lambda x: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(item,devices_storage[item]['device_type']))
+            BigButton = OpenerButton()
+            BigButton.bind(on_release=lambda x: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(item,
+                                                                                                             devices_storage[
+                                                                                                                 item][
+                                                                                                                 'device_type']))
             # add OpenerButton to Box
 
             Box.add_widget(BigButton)
-            # OpenButton = Button(text="Open", size_hint_x=0.3)
-
-            # create image inside button
-            # img = Image(source="resources/plus.png", size_hint_x=0.3, pos_hint={'center_x': OpenButton.center_x, 'center_y': OpenButton.center_y})
-            # img = Image(source="resources/plus.png", size_hint=(None, None), size=(50, 50))
-            # add img to OpenButton
-            # OpenButton.add_widget(img)
-            # add OpenButton to Box
-            # Box.add_widget(OpenButton)
-            # OpenButton.bind(on_release=lambda x: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(item,
-            #                                                                                                  devices_storage[
-             #                                                                                                     item][
-              #                                                                                                    'device_type']))
 
             self.add_widget(Box)
 
@@ -174,6 +164,79 @@ class Manager(ScreenManager):
     last_screen = ObjectProperty()
     splash_next = ObjectProperty()
 
+class ToolBar(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.size_hint_y = None
+        self.height = 100
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        # set orientation to horizontal
+        self.orientation = 'horizontal'
+
+        self.add_widget(AddButton())
+        self.add_widget(HomeButton())
+        self.add_widget(MeButton())
+        # background color
+        self.background_color = (1, 1, 1, 1)
+        # update size on window resize
+        self.size_hint = (None, None)
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        # add padding to half the width of root screen
+
+
+
+    # function to update size on resize
+
+
+def changeScreenMe(*args,**kwargs):
+    App.get_running_app().root.current = 'ScreenAboutMe'
+
+def changeScreenHome(*args,**kwargs):
+    App.get_running_app().root.current = 'ScreenHome'
+
+def changeScreenAdd(*args,**kwargs):
+    App.get_running_app().root.current = 'ScreenAdd'
+
+class HomeButton(ButtonBehavior, Image):
+    # set image to resources/plus.png
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.source = 'resources/17-178841_home-png-home-icon-free-2975121301.png'
+        self.size_hint = (None, None)
+        self.size = (50, 50)
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        # root.manager.current = root.manager.last_screen
+        #                     root.manager.last_screen = "ScreenAdd"
+
+        # set bind to the button press to open the add screen
+
+        self.on_release = changeScreenHome
+        # scale image to height of root widget
+        self.image_size = self.size
+
+
+
+class AddButton(ButtonBehavior, Image):
+    # set image to resources/plus.png
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.source = 'resources/plus.png'
+        self.size_hint = (None, None)
+        self.size = (50, 50)
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        self.on_release = changeScreenAdd
+
+
+
+class MeButton(ButtonBehavior, Image):
+    # set image to resources/plus.png
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.source = 'resources/anonymous-person-icon-23.jpg'
+        self.size_hint = (None, None)
+        self.size = (50, 50)
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        self.bind(on_release=changeScreenMe)
 
 class LunaApp(MDApp):
 
@@ -182,7 +245,6 @@ class LunaApp(MDApp):
         self.theme_cls.theme_style = "Dark"
         # change colour of window to purple
         Window.clearcolor = (1, 0, 0, 1)
-
 
         self.root = Manager()
         self.checkComplete()  # check if devices already present if so, skip add device screen!

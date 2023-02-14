@@ -10,6 +10,7 @@
 
 
 
+
 <Manager>:
     id: fuckeroni
     screenwelcome: screen_welcome_id
@@ -46,6 +47,7 @@
 <ScreenWelcome>:
     BoxLayout:
         orientation: 'vertical'
+
         Label:
             text: 'Welcome to the\n Star Tracker IOT APP'
             size_hint_y: 0.9
@@ -66,6 +68,7 @@
 
     id: devices
     BoxLayout:
+
         orientation: 'vertical'
         Label:
             text: "Star Tracker Add Device"
@@ -122,6 +125,7 @@
     BoxLayout:
         orientation: "vertical"
         BoxLayout:
+            id: homeScreen_HomeHome
             size_hint_y:0.9
             orientation: 'vertical'
             Label:
@@ -138,28 +142,12 @@
                     size_hint_y:None
                     height: self.minimum_height
                     id: add_here
+            ToolBar:
 
 
 
 
-        BoxLayout:
-            id: gimme
-            size_hint_y: 0.1
-            orientation: "horizontal"
 
-            Button:
-                text: "AddNew"
-                on_press:
-                    root.manager.last_screen = 'ScreenHome'
-                    root.manager.current = "ScreenAdd"
-            Button:
-                text: "Home"
-
-            Button:
-                text: "Me"
-                on_press:
-                    root.manager.last_screen = "ScreenHome"
-                    root.manager.current = "ScreenAboutMe"
 
 <ScreenIOTControl>:
     BoxLayout:
