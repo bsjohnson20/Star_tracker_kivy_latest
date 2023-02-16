@@ -1,4 +1,6 @@
 import weakref
+
+import kivy
 from IPy import IP
 from kivy.app import App
 from kivy.clock import Clock
@@ -40,6 +42,7 @@ class ScreenIOTControl(Screen):
         App.get_running_app().root.current = 'ScreenIOTControl'
         # devices_storage[caller_name]
         print(name, dev_type)
+
 
 
 class ScreenAddDevice(Screen):
@@ -100,10 +103,14 @@ class OpenerButton(ButtonBehavior, Image):
     # set image to resources/plus.png
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.source = 'resources/play.png'
+        self.source = 'resources/play-svgrepo-com (1).png'
         self.size_hint = (None, None)
         self.size = (50, 50)
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+
+
+        
+        
 
 
 class ScreenHome(Screen):
@@ -201,9 +208,9 @@ class HomeButton(ButtonBehavior, Image):
     # set image to resources/plus.png
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.source = 'resources/17-178841_home-png-home-icon-free-2975121301.png'
+        self.source = 'resources/home-1-svgrepo-com.png'
         self.size_hint = (None, None)
-        self.size = (50, 50)
+        # self.size = (50, 50)
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
         # root.manager.current = root.manager.last_screen
         #                     root.manager.last_screen = "ScreenAdd"
@@ -214,17 +221,24 @@ class HomeButton(ButtonBehavior, Image):
         # scale image to height of root widget
         self.image_size = self.size
 
+        
+
+
+
 
 
 class AddButton(ButtonBehavior, Image):
     # set image to resources/plus.png
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.source = 'resources/plus.png'
+        self.source = 'resources/add-circle-svgrepo-com.png'
         self.size_hint = (None, None)
-        self.size = (50, 50)
+        # self.size = (50, 50)
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
         self.on_release = changeScreenAdd
+        self.background = "black"
+        print(self.size)
 
 
 
@@ -232,9 +246,10 @@ class MeButton(ButtonBehavior, Image):
     # set image to resources/plus.png
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.source = 'resources/anonymous-person-icon-23.jpg'
+        self.source = 'resources/account-svgrepo-com.png'
+        #self.source = 'resources/anonymous-person-icon-23.jpg'
         self.size_hint = (None, None)
-        self.size = (50, 50)
+        # self.size = (50, 50)
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
         self.bind(on_release=changeScreenMe)
 
