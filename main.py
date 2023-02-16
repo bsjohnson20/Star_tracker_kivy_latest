@@ -116,6 +116,10 @@ class OpenerButton(ButtonBehavior, Image):
 class ScreenHome(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        # resize Screen to fit the size of the screen
+        self.size = Window.size
+        self.size_hint = (None, None)
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
 
     def setup(self):
         """
@@ -171,6 +175,7 @@ class Manager(ScreenManager):
     last_screen = ObjectProperty()
     splash_next = ObjectProperty()
 
+
 class ToolBar(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -190,19 +195,20 @@ class ToolBar(BoxLayout):
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
         # add padding to half the width of root screen
 
-
-
     # function to update size on resize
 
 
-def changeScreenMe(*args,**kwargs):
+def changeScreenMe(*args, **kwargs):
     App.get_running_app().root.current = 'ScreenAboutMe'
 
-def changeScreenHome(*args,**kwargs):
+
+def changeScreenHome(*args, **kwargs):
     App.get_running_app().root.current = 'ScreenHome'
 
-def changeScreenAdd(*args,**kwargs):
+
+def changeScreenAdd(*args, **kwargs):
     App.get_running_app().root.current = 'ScreenAdd'
+
 
 class HomeButton(ButtonBehavior, Image):
     # set image to resources/plus.png
@@ -226,7 +232,6 @@ class HomeButton(ButtonBehavior, Image):
 
 
 
-
 class AddButton(ButtonBehavior, Image):
     # set image to resources/plus.png
 
@@ -241,7 +246,6 @@ class AddButton(ButtonBehavior, Image):
         print(self.size)
 
 
-
 class MeButton(ButtonBehavior, Image):
     # set image to resources/plus.png
     def __init__(self, **kwargs):
@@ -252,6 +256,7 @@ class MeButton(ButtonBehavior, Image):
         # self.size = (50, 50)
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
         self.bind(on_release=changeScreenMe)
+
 
 class LunaApp(MDApp):
 
