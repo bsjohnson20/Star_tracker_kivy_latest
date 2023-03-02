@@ -123,8 +123,11 @@
 
 <ScreenHome>:
     BoxLayout:
+        size_hint_x: 1
+        id: screenhome_box
         orientation: "vertical"
         BoxLayout:
+
             id: homeScreen_HomeHome
             size_hint_y:0.9
             orientation: 'vertical'
@@ -133,9 +136,7 @@
                 size_hint_y: 0.1
             # Cards go here - build a generator for them...
             ScrollView:
-                pos_hint: {'center_x': .5}
-                size_hint_x: None
-                width: "400dp"
+                size_hint_x: 1
 
                 GridLayout:
                     cols: 1
@@ -151,29 +152,34 @@
 
 <ScreenIOTControl>:
     BoxLayout:
-        orientation: 'vertical'
-        # title
-        BoxLayout:
-            orientation: 'vertical'
-        # Info Screen
-        BoxLayout:
-            orientation: 'vertical'
-        # Control panel
-        BoxLayout:
-            orientation: 'vertical'
-        # Log Screen
-        BoxLayout:
-            id: gimme
-            size_hint_y: 0.1
-            orientation: "horizontal"
+        # min size of the box
+        size_hint: 0.5, 0.5
+        # centre the box
+        pos_hint: {"center_x": .5, "center_y": .5}
 
-            Button:
-                text: "Back"
-                on_press:
-                    root.manager.current = "ScreenHome"
-                # we don't use last_Screen, as we dynamically generate it. ANd I can't be bothered making it even more path generated
-            Button:
-            Button:
+        orientation: 'vertical'
+        Label:
+            text: "Star Tracker IOT Control"
+            size_hint_y: 0.1
+        BoxLayout:
+            id: iotcontrol_box
+            orientation: 'vertical'
+            size_hint_y: 0.9
+            # pos hint is relative to the parent widget
+            pos_hint: {"center_x": .5, "center_y": .5}
+
+        BoxLayout:
+            id: toolbar_box
+            # centre the toolbar
+            pos_hint: {"center_x": .5, "center_y": .5}
+            # scale toolbar to 10% of screen height
+            size_hint_y: 0.1
+
+            # scale x to 100% of screen width
+            size_hint_x: 1
+
+
+
 
 <ScreenAboutMe>:
     BoxLayout:
