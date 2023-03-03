@@ -20,6 +20,8 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.textinput import TextInput
 from kivymd.app import MDApp
 from kivymd.uix.button import MDIconButton
+from kivymd.uix.card import MDCard
+from kivy.properties import StringProperty
 
 settings_storage = JsonStore('settings.json')
 devices_storage = JsonStore('devices.json')
@@ -27,6 +29,12 @@ devices_storage = JsonStore('devices.json')
 
 # settings_storage.put("LunaDevice",ip="123.42.12",desc="Hello!",LastOnline=5245425)
 # settings_storage.get("LunaDevice")
+
+from kivy.config import Config
+ 
+# 0 being off 1 being on as in true / false
+# you can use 0 or 1 && True or False
+Config.set('graphics', 'resizable', '1')
 
 
 class ScreenWelcome(Screen):
@@ -105,6 +113,9 @@ class IOT_toolbar(BoxLayout):
 
 class ScreenIOTControl(Screen):
     def loadPage(self, name, dev_type, **kwargs):
+        # fetch name.text
+        name
+        
         # load the page for the device type and device name with the data and controls.
         App.get_running_app().root.current = 'ScreenIOTControl'
         # devices_storage[caller_name]
@@ -186,6 +197,8 @@ class ScreenAddDevice(Screen):
     def callback(self, text_item):
         print(text_item)
 
+
+
     def assemble(self, *args):
         print("Assembling STARTED")
         dropdown = DropDown()
@@ -216,7 +229,10 @@ class OpenerButton(MDIconButton):
 
 
         
-        
+class codeinpain:
+    def __init__(self,item, devType ):
+        self.item = item
+        self.type = devType
 
 
 class ScreenHome(Screen):
@@ -240,6 +256,7 @@ class ScreenHome(Screen):
         print(devices_storage.count())
         for item in devices_storage:
             print(item)
+            new = codeinpain(item, devices_storage[item]['device_type'])
             x = GridLayout(cols=2)
             # info labels
             name_lab = Label(text="name")
@@ -260,7 +277,9 @@ class ScreenHome(Screen):
             name_label.pos_hint = 0.3, 1
             ip_label = Label(text=devices_storage[item]['ip'])
             ip_label.pos_hint = 0.3, 1
+            
 
+            
 
             # add labels
             x.add_widget(name_lab)
@@ -274,22 +293,31 @@ class ScreenHome(Screen):
 
             x.add_widget(type_lab)
             x.add_widget(dev_type)
-
+            
+            
+            print("I am",self)
+            
+            # x
+            self.parent.item = item
 
             # create THE Box this'll contain labels and the buton to open the corresponding IOT panel
-            Box = BoxLayout(size_hint_y=None)
+            Box = DeviceCard(size_hint_y=None)
+            Box.padding = 4
+            Box.on_release=lambda: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(item, devices_storage[new.item]['device_type'])
             Box.add_widget(x)
+            self.ids['luna'] = name_label
+            # debug button
+            
+            
+            Box.size =  0.1 * self.parent.width, 1* self.parent.height
             # clickable image
-            BigButton = OpenerButton()
-            BigButton.size_hint_x = 0.3
-            print("BINDING TO "+item+" "+devices_storage[item]['device_type'])
-            BigButton.bind(on_release=lambda x: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(name_label.text, devices_storage[name_label.text]['device_type']))
+            print("BINDING TO "+self.parent.item+" "+devices_storage[item]['device_type'])
             print(name_label.text)
 
             # add OpenerButton to Box
-            Box.add_widget(BigButton)
-
+            
             self.add_widget(Box)
+            
 
 
     def IOTOpener(self, device_type):
@@ -298,6 +326,13 @@ class ScreenHome(Screen):
 
 class ScreenMain(Screen):
     pass
+
+# testing
+class DeviceCard(MDCard):
+    text = StringProperty
+    
+    def __init__(self,**kwargs):
+        pass
 
 
 class Manager(ScreenManager):
@@ -327,6 +362,7 @@ class ToolBar(BoxLayout):
 
 def changeScreenMe(*args, **kwargs):
     App.get_running_app().root.current = 'ScreenAboutMe'
+    App.get_running_app().root.last_screen = 'ScreenHome'
 
 
 def changeScreenHome(*args, **kwargs):
@@ -335,6 +371,7 @@ def changeScreenHome(*args, **kwargs):
 
 def changeScreenAdd(*args, **kwargs):
     App.get_running_app().root.current = 'ScreenAdd'
+    App.get_running_app().root.last_screen = 'ScreenHome'
 
 
 class HomeButton(MDIconButton):
