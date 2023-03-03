@@ -45,10 +45,18 @@ class IOT_toolbar(BoxLayout):
         # create boxlayout
         box = BoxLayout(orientation="horizontal")
 
-        # add the controls to the boxlayout
-        box.add_widget(Button(text="back", on_press=self.back))
-        box.add_widget(Button(text="DoesNothing", on_press=lambda x: print("Hello!")))
-        box.add_widget(Button(text="Settings", on_press=self.settings))
+
+        # create controls
+        back = MDIconButton(text="back", on_press=self.back, icon="arrow-left")
+        DoesNothing = MDIconButton(text="DoesNothing", on_press=lambda x: print("!"), icon="home")
+        Settings = MDIconButton(text="Settings", on_press=self.settings)
+
+        # add controls to box
+        box.add_widget(back)
+        box.add_widget(DoesNothing)
+        box.add_widget(Settings)
+
+
 
         # log using logging module
         self.add_widget(box)
@@ -201,7 +209,7 @@ class OpenerButton(MDIconButton):
     # set image to resources/plus.png
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.icon = 'resources/play-svgrepo-com (1).png'
+        self.icon = 'play'
         # increase icon size
         self.icon_size = "64dp"
         self.font_size = "64dp"
@@ -333,7 +341,7 @@ class HomeButton(MDIconButton):
     # set image to resources/plus.png
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.icon = 'resources/home-1-svgrepo-com.png'
+        self.icon = 'home'
         self.size_hint = (0.3, 1)
         self.icon_size = "64dp"
         # self.size = (50, 50)
@@ -356,7 +364,7 @@ class AddButton(MDIconButton):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.icon = 'resources/add-circle-svgrepo-com.png'
+        self.icon = 'view-grid-plus-outline'
         self.size_hint = (0.3, 1)
         self.icon_size = "64dp"
         # self.size = (50, 50)
@@ -370,7 +378,7 @@ class MeButton(MDIconButton):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.icon_size = "64dp"
-        self.icon = 'resources/account-svgrepo-com.png'
+        self.icon = 'account'
         #self.source = 'resources/anonymous-person-icon-23.jpg'
         self.size_hint = (0.3, 1)
         # self.size = (50, 50)
