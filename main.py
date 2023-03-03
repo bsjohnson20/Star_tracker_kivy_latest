@@ -327,6 +327,7 @@ class ToolBar(BoxLayout):
 
 def changeScreenMe(*args, **kwargs):
     App.get_running_app().root.current = 'ScreenAboutMe'
+    App.get_running_app().root.last_screen = 'ScreenHome'
 
 
 def changeScreenHome(*args, **kwargs):
@@ -335,6 +336,7 @@ def changeScreenHome(*args, **kwargs):
 
 def changeScreenAdd(*args, **kwargs):
     App.get_running_app().root.current = 'ScreenAdd'
+    App.get_running_app().root.last_screen = 'ScreenHome'
 
 
 class HomeButton(MDIconButton):
