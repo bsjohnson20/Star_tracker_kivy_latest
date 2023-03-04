@@ -104,19 +104,22 @@
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: 0.1
-            Button:
-
+            MDIconButton:
+                size_hint_x: 1
                 text: "Back"
                 on_press:
                     root.manager.current = root.manager.last_screen
                     root.manager.last_screen = "ScreenAdd"
+                icon: "arrow-left"
 
 
-            Button:
+            MDIconButton:
+                size_hint_x: 1
                 text: "Continue"
                 on_press:
                     root.Validate()
                     # self.Validate()
+                icon: "checkbox-marked-circle"
 
 
 
@@ -144,6 +147,7 @@
                     spacing: 10
                     id: add_here
             ToolBar:
+                size_hint_y: 0.1
 
 
 
@@ -153,7 +157,6 @@
 <ScreenIOTControl>:
     BoxLayout:
         # min size of the box
-        size_hint: 0.5, 0.5
         # centre the box
         pos_hint: {"center_x": .5, "center_y": .5}
 
@@ -170,8 +173,6 @@
 
         BoxLayout:
             id: toolbar_box
-            # centre the toolbar
-            pos_hint: {"center_x": .5, "center_y": .5}
             # scale toolbar to 10% of screen height
             size_hint_y: 0.1
 

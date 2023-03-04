@@ -26,12 +26,11 @@ from kivy.properties import StringProperty
 settings_storage = JsonStore('settings.json')
 devices_storage = JsonStore('devices.json')
 
-
 # settings_storage.put("LunaDevice",ip="123.42.12",desc="Hello!",LastOnline=5245425)
 # settings_storage.get("LunaDevice")
 
 from kivy.config import Config
- 
+
 # 0 being off 1 being on as in true / false
 # you can use 0 or 1 && True or False
 Config.set('graphics', 'resizable', '1')
@@ -45,32 +44,31 @@ class ScreenWelcome(Screen):
 class ScreenAboutMe(Screen):
     pass
 
+
 class IOT_toolbar(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-
         # create boxlayout
         box = BoxLayout(orientation="horizontal")
 
-
         # create controls
         back = MDIconButton(text="back", on_press=self.back, icon="arrow-left")
+        back.size_hint = (0.3, 1)
         DoesNothing = MDIconButton(text="DoesNothing", on_press=lambda x: print("!"), icon="home")
+        DoesNothing.size_hint = (0.3, 1)
         Settings = MDIconButton(text="Settings", on_press=self.settings)
+        Settings.size_hint = (0.3, 1)
 
         # add controls to box
         box.add_widget(back)
         box.add_widget(DoesNothing)
         box.add_widget(Settings)
 
-
-
         # log using logging module
         self.add_widget(box)
         logging.debug("Created toolbar")
         print('added toolbar')
-
 
     def back(self, *args):
         App.get_running_app().root.current = "ScreenHome"
@@ -82,9 +80,9 @@ class IOT_toolbar(BoxLayout):
         # debug log using logging module
         logging.debug("Going to settings screen")
 
-
         # create boxlayout
-        box = BoxLayout(orientation="vertical", spacing=10, padding=10, size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        box = BoxLayout(orientation="vertical", spacing=10, padding=10, size_hint=(0.5, 0.5),
+                        pos_hint={'center_x': 0.5, 'center_y': 0.5})
 
         # add input for ip address
         box.add_widget(Label(text="IP Address:"))
@@ -115,7 +113,7 @@ class ScreenIOTControl(Screen):
     def loadPage(self, name, dev_type, **kwargs):
         # fetch name.text
         name
-        
+
         # load the page for the device type and device name with the data and controls.
         App.get_running_app().root.current = 'ScreenIOTControl'
         # devices_storage[caller_name]
@@ -126,9 +124,6 @@ class ScreenIOTControl(Screen):
         # clear toolbar
         self.ids.toolbar_box.clear_widgets()
 
-
-
-
         # create boxlayout
         box = BoxLayout(orientation="vertical")
 
@@ -136,7 +131,8 @@ class ScreenIOTControl(Screen):
         box.add_widget(Label(text="Device Controls", size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
 
         # add the controls to the boxlayout in another container
-        main_box = BoxLayout(orientation="vertical", spacing=10, padding=10, size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        main_box = BoxLayout(orientation="vertical", spacing=10, padding=10, size_hint=(0.5, 0.5),
+                             pos_hint={'center_x': 0.5, 'center_y': 0.5})
         main_box.add_widget(Label(text="Hello!"))
         main_box.add_widget(Label(text=name))
         main_box.add_widget(Label(text=devices_storage[name]["ip"]))
@@ -147,19 +143,11 @@ class ScreenIOTControl(Screen):
         main_box.size_hint = (0.5, 0.5)
         main_box.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
 
-
         # add the main box to the boxlayout
         self.ids.iotcontrol_box.add_widget(main_box)
 
-
         # add toolbar to root
         self.ids.toolbar_box.add_widget(IOT_toolbar())
-
-
-
-
-
-
 
 
 class ScreenAddDevice(Screen):
@@ -197,8 +185,6 @@ class ScreenAddDevice(Screen):
     def callback(self, text_item):
         print(text_item)
 
-
-
     def assemble(self, *args):
         print("Assembling STARTED")
         dropdown = DropDown()
@@ -228,9 +214,8 @@ class OpenerButton(MDIconButton):
         self.font_size = "64dp"
 
 
-        
 class codeinpain:
-    def __init__(self,item, devType ):
+    def __init__(self, item, devType):
         self.item = item
         self.type = devType
 
@@ -240,7 +225,6 @@ class ScreenHome(Screen):
         super().__init__(**kwargs)
         # resize Screen to fit the size of the screen
         self.size = Window.size
-        self.size_hint = (None, None)
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
 
     def setup(self):
@@ -277,9 +261,6 @@ class ScreenHome(Screen):
             name_label.pos_hint = 0.3, 1
             ip_label = Label(text=devices_storage[item]['ip'])
             ip_label.pos_hint = 0.3, 1
-            
-
-            
 
             # add labels
             x.add_widget(name_lab)
@@ -293,32 +274,28 @@ class ScreenHome(Screen):
 
             x.add_widget(type_lab)
             x.add_widget(dev_type)
-            
-            
-            print("I am",self)
-            
+
+            print("I am", self)
+
             # x
             self.parent.item = item
 
             # create THE Box this'll contain labels and the buton to open the corresponding IOT panel
-            Box = DeviceCard(size_hint_y=None)
+            Box = DeviceCard(item, dev_type, size_hint_y=None)
             Box.padding = 4
-            Box.on_release=lambda: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(item, devices_storage[new.item]['device_type'])
+
             Box.add_widget(x)
             self.ids['luna'] = name_label
             # debug button
-            
-            
-            Box.size =  0.1 * self.parent.width, 1* self.parent.height
+
+            Box.size = 0.1 * self.parent.width, 1 * self.parent.height
             # clickable image
-            print("BINDING TO "+self.parent.item+" "+devices_storage[item]['device_type'])
+            print("BINDING TO " + self.parent.item + " " + devices_storage[item]['device_type'])
             print(name_label.text)
 
             # add OpenerButton to Box
-            
-            self.add_widget(Box)
-            
 
+            self.add_widget(Box)
 
     def IOTOpener(self, device_type):
         pass
@@ -327,12 +304,18 @@ class ScreenHome(Screen):
 class ScreenMain(Screen):
     pass
 
+
 # testing
 class DeviceCard(MDCard):
     text = StringProperty
-    
-    def __init__(self,**kwargs):
-        pass
+
+    def __init__(self, name, dev_type, **kwargs):
+        super().__init__(**kwargs)
+        self.name = name
+        self.dev_type = dev_type
+        self.on_release = lambda: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(name,
+                                                                                               devices_storage[name][
+                                                                                                   'device_type'])
 
 
 class Manager(ScreenManager):
@@ -344,17 +327,14 @@ class Manager(ScreenManager):
 class ToolBar(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.height = dp(64)
         # set orientation to horizontal
         self.orientation = 'horizontal'
-
         self.add_widget(AddButton())
         self.add_widget(HomeButton())
         self.add_widget(MeButton())
         # background color
         self.background_color = (1, 1, 1, 1)
         # update size on window resize
-        self.size_hint = (1, 0.2)
         # add padding to half the width of root screen
 
     # function to update size on resize
@@ -380,7 +360,7 @@ class HomeButton(MDIconButton):
         super().__init__(**kwargs)
         self.icon = 'home'
         self.size_hint = (0.3, 1)
-        self.icon_size = "64dp"
+        # self.icon_size = "64dp"
         # self.size = (50, 50)
         # root.manager.current = root.manager.last_screen
         #                     root.manager.last_screen = "ScreenAdd"
@@ -391,10 +371,6 @@ class HomeButton(MDIconButton):
         # scale image to height of root widget
         self.image_size = self.size
 
-        
-
-
-
 
 class AddButton(MDIconButton):
     # set image to resources/plus.png
@@ -403,7 +379,7 @@ class AddButton(MDIconButton):
         super().__init__(**kwargs)
         self.icon = 'view-grid-plus-outline'
         self.size_hint = (0.3, 1)
-        self.icon_size = "64dp"
+        # self.icon_size = "64dp"
         # self.size = (50, 50)
         self.on_release = changeScreenAdd
         self.background = "black"
@@ -414,9 +390,9 @@ class MeButton(MDIconButton):
     # set image to resources/plus.png
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.icon_size = "64dp"
+        # self.icon_size = "64dp"
         self.icon = 'account'
-        #self.source = 'resources/anonymous-person-icon-23.jpg'
+        # self.source = 'resources/anonymous-person-icon-23.jpg'
         self.size_hint = (0.3, 1)
         # self.size = (50, 50)
         self.bind(on_release=changeScreenMe)
