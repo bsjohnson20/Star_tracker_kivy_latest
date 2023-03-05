@@ -204,7 +204,47 @@
 
 <ScreenAboutMe>:
     BoxLayout:
-        Button:
-            text: "WIP"
-            on_press:
-                root.manager.current = "ScreenHome"
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint_y: 0.1
+            orientation: 'horizontal'
+            MDLabel:
+                text: "Star Tracker About Me"
+                size_hint_y: 0.1
+                halign:"center"
+            MDIconButton:
+                # Credits
+                size_hint_x: 0.1
+                size_hint_y: 1
+                icon: "information"
+                on_release:
+                    root.manager.current = "ScreenCredits"
+                    root.manager.last_screen = "ScreenAboutMe"
+        BoxLayout:
+            size_hint_x: 0.9
+            orientation: 'vertical'
+            MDLabel:
+                text: "Hello!"
+
+
+
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: 0.1
+            MDIconButton:
+                size_hint_x: 1
+                text: "Back"
+                on_press:
+                    root.manager.current = root.manager.last_screen
+                    root.manager.last_screen = "ScreenAboutMe"
+                icon: "arrow-left"
+
+            MDIconButton:
+                size_hint_x: 1
+                text: "Save"
+                on_press:
+                    root.manager.current = root.manager.last_screen
+                    root.manager.last_screen = "ScreenAboutMe"
+                icon: "content-save"
+
