@@ -22,7 +22,9 @@ from kivymd.app import MDApp
 from kivymd.uix.button import MDIconButton
 from kivymd.uix.card import MDCard
 from kivy.properties import StringProperty
+from kivymd.uix.label import MDLabel
 
+Label = MDLabel
 settings_storage = JsonStore('settings.json')
 devices_storage = JsonStore('devices.json')
 
@@ -110,7 +112,6 @@ class DeviceSettings(Screen):
         # create back button
         back = MDIconButton(icon='arrow-left', on_release=self.change_screen)
         back.size_hint_x = 1
-
 
         # add controls to box
         box.add_widget(ip)
@@ -287,12 +288,16 @@ class ScreenHome(Screen):
             x = GridLayout(cols=2)
             # info labels
             name_lab = Label(text="name")
+            name_lab.text_size = self.width, None
             name_lab.pos_hint = 0.3, 1
             desc_lab = Label(text="desc")
+            desc_lab.text_size = self.width, None
             desc_lab.pos_hint = 0.3, 1
             ip_lab = Label(text="ip")
+            ip_lab.text_size = self.width, None
             ip_lab.pos_hint = 0.3, 1
             type_lab = Label(text="type")
+            type_lab.text_size = self.width, None
             type_lab.pos_hint = 0.3, 1
 
             # data labels
@@ -324,14 +329,16 @@ class ScreenHome(Screen):
             self.parent.item = item
 
             # create THE Box this'll contain labels and the buton to open the corresponding IOT panel
-            Box = DeviceCard(item, dev_type, size_hint_y=None)
-            Box.padding = 4
+            Box = DeviceCard(item, dev_type, size_hint_y=None, height=200, pos_hint={'center_x': 0.5, 'center_y': 0.5})
+            Box.padding = 16
+
+            # set size and width to exactly half of window size
+            Box.size_hint_x = 0.5
 
             Box.add_widget(x)
             self.ids['luna'] = name_label
             # debug button
 
-            Box.size = 0.1 * self.parent.width, 1 * self.parent.height
             # clickable image
             print("BINDING TO " + self.parent.item + " " + devices_storage[item]['device_type'])
             print(name_label.text)
@@ -352,6 +359,7 @@ class ScreenMain(Screen):
 class DeviceCard(MDCard):
     text = StringProperty
 
+
     def __init__(self, name, dev_type, **kwargs):
         super().__init__(**kwargs)
         self.name = name
@@ -359,6 +367,9 @@ class DeviceCard(MDCard):
         self.on_release = lambda: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(name,
                                                                                                devices_storage[name][
                                                                                                    'device_type'])
+        self.padding = 4
+        self.size_hint_x = 0.8
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
 
 
 class Manager(ScreenManager):
