@@ -459,7 +459,9 @@ class LunaApp(MDApp):
         self.theme_cls.theme_style = "Dark"
         # change colour of window to purple
         Window.clearcolor = (1, 0, 0, 1)
-
+        App.get_running_app().theme_cls.theme_style = "Dark"
+        # change buttons to red
+        App.get_running_app().theme_cls.primary_palette = "Purple"
         self.root = Manager()
         self.checkComplete()  # check if devices already present if so, skip add device screen!
         return self.root
@@ -481,6 +483,19 @@ class LunaApp(MDApp):
         self.root.current = 'Screen2'
         """
 
+    def LightMode(self):
+        App.get_running_app().theme_cls.theme_style = "Light"
+        # change buttons to red
+        App.get_running_app().primary_palette = "Red"
+
+    def DarkMode(self):
+        App.get_running_app().theme_cls.theme_style = "Dark"
+        # change buttons to red
+        App.get_running_app().theme_cls.primary_palette = "Purple"
+
+class ScreenCredits(Screen):
+    def on_enter(self, *args):
+        print("ENTERED CREDITS SCREEN")
 
 if __name__ == "__main__":
     LunaApp().run()
