@@ -52,13 +52,19 @@
     BoxLayout:
         orientation: 'vertical'
 
-        Label:
+        MDTextButton:
             text: 'Welcome to the\n Star Tracker IOT APP'
             size_hint_y: 0.9
-        Button:
+            size_hint_x: 1
+            halign:"center"
+            on_release:
+                root.manager.current = root.manager.splash_next
+                root.manager.last_screen = 'ScreenWelcome'
+        MDRaisedButton:
             halign: 'center'
             size_hint_y: 0.1
             text: "Continue!"
+            size_hint_x: 1
             on_press:
 
                 root.manager.current = root.manager.splash_next
@@ -74,36 +80,44 @@
     BoxLayout:
 
         orientation: 'vertical'
-        Label:
+        MDLabel:
             text: "Star Tracker Add Device"
             size_hint_y: 0.1
+            halign:"center"
+            # center
+            pos_hint: {"center_x": .5, "center_y": .5}
         GridLayout:
             id: addDevice_grid
-            padding: {0,80}
-            pos_hint_y: 0.5
-            size_hint_y: 0.8
+            padding: 20
+            spacing: 20
 
             cols: 2
-            Label:
+            MDLabel:
                 text: "Name"
             TextInput:
                 multiline: False
                 id: name
-            Label:
+                font_size: self.height * 0.5
+            MDLabel:
                 text: "Desc"
             TextInput:
                 multiline: False
                 id: desc
-            Label:
+                font_size: self.height * 0.5
+            MDLabel:
                 text: "IP"
             TextInput:
                 id: ip_id
                 multiline: False
-            Label:
+                font_size: self.height * 0.5
+            MDLabel:
                 text: "Device"
-            Button:
+            MDRectangleFlatButton:
                 text: "Device Types"
                 id: dropdown_opener
+                size_hint_x: 1
+                size_hint_y: 0.8
+
 
         BoxLayout:
             orientation: 'horizontal'
@@ -138,9 +152,11 @@
             id: homeScreen_HomeHome
             size_hint_y:0.9
             orientation: 'vertical'
-            Label:
+            MDLabel:
                 text: "Star Tracker Home"
                 size_hint_y: 0.1
+                size_hint_x: 1
+                halign:"center"
             # Cards go here - build a generator for them...
             ScrollView:
                 size_hint_x: 1
@@ -165,9 +181,10 @@
         pos_hint: {"center_x": .5, "center_y": .5}
 
         orientation: 'vertical'
-        Label:
+        MDLabel:
             text: "Star Tracker IOT Control"
             size_hint_y: 0.1
+            halign:"center"
         BoxLayout:
             id: iotcontrol_box
             orientation: 'vertical'
@@ -187,7 +204,47 @@
 
 <ScreenAboutMe>:
     BoxLayout:
-        Button:
-            text: "WIP"
-            on_press:
-                root.manager.current = "ScreenHome"
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint_y: 0.1
+            orientation: 'horizontal'
+            MDLabel:
+                text: "Star Tracker About Me"
+                size_hint_y: 0.1
+                halign:"center"
+            MDIconButton:
+                # Credits
+                size_hint_x: 0.1
+                size_hint_y: 1
+                icon: "information"
+                on_release:
+                    root.manager.current = "ScreenCredits"
+                    root.manager.last_screen = "ScreenAboutMe"
+        BoxLayout:
+            size_hint_x: 0.9
+            orientation: 'vertical'
+            MDLabel:
+                text: "Hello!"
+
+
+
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: 0.1
+            MDIconButton:
+                size_hint_x: 1
+                text: "Back"
+                on_press:
+                    root.manager.current = root.manager.last_screen
+                    root.manager.last_screen = "ScreenAboutMe"
+                icon: "arrow-left"
+
+            MDIconButton:
+                size_hint_x: 1
+                text: "Save"
+                on_press:
+                    root.manager.current = root.manager.last_screen
+                    root.manager.last_screen = "ScreenAboutMe"
+                icon: "content-save"
+
