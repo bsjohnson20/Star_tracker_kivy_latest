@@ -52,13 +52,19 @@
     BoxLayout:
         orientation: 'vertical'
 
-        MDLabel:
+        MDTextButton:
             text: 'Welcome to the\n Star Tracker IOT APP'
             size_hint_y: 0.9
-        Button:
+            size_hint_x: 1
+            halign:"center"
+            on_release:
+                root.manager.current = root.manager.splash_next
+                root.manager.last_screen = 'ScreenWelcome'
+        MDRaisedButton:
             halign: 'center'
             size_hint_y: 0.1
             text: "Continue!"
+            size_hint_x: 1
             on_press:
 
                 root.manager.current = root.manager.splash_next
@@ -77,6 +83,7 @@
         MDLabel:
             text: "Star Tracker Add Device"
             size_hint_y: 0.1
+            halign:"center"
             # center
             pos_hint: {"center_x": .5, "center_y": .5}
         GridLayout:
