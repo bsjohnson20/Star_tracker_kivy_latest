@@ -18,6 +18,8 @@
     screenhome: screen_Home_id
     screenaboutme: screen_AboutMe_id
     screeniotcontrol: screen_IOTControl_id
+    screencredits: screen_credits_id
+
 
 # The order below determines which screen is displayed after app loads
 
@@ -45,6 +47,9 @@
     DeviceSettings:
         id: device_settings_id
         name: "DeviceSettings"
+    ScreenCredits:
+        id: screen_credits_id
+        name: "ScreenCredits"
 
 
 
@@ -199,6 +204,36 @@
 
             # scale x to 100% of screen width
             size_hint_x: 1
+<ScreenCredits>:
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint_y: 0.1
+            orientation: 'horizontal'
+            MDLabel:
+                text: "Star Tracker Credits"
+                size_hint_y: 0.1
+                halign:"center"
+        MDLabel:
+            size_hint_y: 0.1
+            halign:"center"
+            text: "This is an app created for my coursework, and I have enjoyed it's development watching my skills improve.\n The below image is by Remul-Lemlem on devianArt I do not claim ownership of it."
+        AsyncImage:
+            # load image from website
+            source: "Princess_Luna_Remul-Lemlem_personaluse_fairuse.png"
+            size_hint_y: 0.9
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: 0.1
+            MDIconButton:
+                size_hint_x: 1
+                text: "Back"
+                on_release:
+                    root.manager.current = root.manager.last_screen
+                    root.manager.last_screen = "ScreenHome"
+                icon: "arrow-left"
+
+
 
 <DeviceSettings>
 
@@ -221,11 +256,32 @@
                     root.manager.current = "ScreenCredits"
                     root.manager.last_screen = "ScreenAboutMe"
         BoxLayout:
-            size_hint_x: 0.9
             orientation: 'vertical'
+            size_hint_y: 0.9
+            # Theme settings
             MDLabel:
-                text: "Hello!"
-
+                text: "Theme"
+                size_hint_y: 0.1
+                halign:"center"
+            # set app theme
+            MDRectangleFlatButton:
+                text: "Light"
+                id: dropdown_opener
+                size_hint_x: 1
+                size_hint_y: 0.8
+                # set theme on release
+                on_release:
+                    # call LightMode
+                    app.get_running_app().LightMode()
+            MDRectangleFlatButton:
+                text: "Dark"
+                id: dropdown_opener
+                size_hint_x: 1
+                size_hint_y: 0.8
+                # set theme on release
+                on_release:
+                    # call DarkMode
+                    app.get_running_app().DarkMode()
 
 
 
@@ -247,4 +303,6 @@
                     root.manager.current = root.manager.last_screen
                     root.manager.last_screen = "ScreenAboutMe"
                 icon: "content-save"
+
+
 
