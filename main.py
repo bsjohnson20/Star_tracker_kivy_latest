@@ -57,7 +57,7 @@ class IOT_toolbar(BoxLayout):
         back.size_hint = (0.3, 1)
         DoesNothing = MDIconButton(text="DoesNothing", on_press=lambda x: print("!"), icon="home")
         DoesNothing.size_hint = (0.3, 1)
-        Settings = MDIconButton(text="Settings", on_press=self.settings)
+        Settings = MDIconButton(icon="cog", on_press=self.settings)
         Settings.size_hint = (0.3, 1)
 
         # add controls to box
@@ -76,37 +76,80 @@ class IOT_toolbar(BoxLayout):
         logging.debug("Going back to home screen")
 
     def settings(self, *args):
-        # App.get_running_app().root.current = "ScreenSettings"
+        App.get_running_app().root.current = "DeviceSettings"
         # debug log using logging module
         logging.debug("Going to settings screen")
 
+
+# DeviceSettings page
+class DeviceSettings(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
         # create boxlayout
-        box = BoxLayout(orientation="vertical", spacing=10, padding=10, size_hint=(0.5, 0.5),
-                        pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        box = BoxLayout(orientation="vertical")
+        self.add_widget(box)
 
-        # add input for ip address
-        box.add_widget(Label(text="IP Address:"))
-        box.add_widget(TextInput(id="ip_id", multiline=False))
+        # create text label and input
+        name = TextInput(hint_text="Device Name", multiline=False)
+        desc = TextInput(hint_text="Device Description", multiline=False)
+        ip = TextInput(hint_text="IP Address", multiline=False)
 
-        # add input for device name
-        box.add_widget(Label(text="Device Name:"))
-        box.add_widget(TextInput(id="name", multiline=False))
+        # give ids
+        self.ids.name = name
+        self.ids.desc = desc
+        self.ids.ip_id = ip
 
-        # add input for device description
-        box.add_widget(Label(text="Device Description:"))
-        box.add_widget(TextInput(id="desc", multiline=False))
+        # create toolbar boxlayout
+        toolbar_box = BoxLayout(orientation="horizontal")
 
-        # add dropdown for device type
-        box.add_widget(Label(text="Device Type:"))
-        dropdown = DropDown()
-        for index in range(10):
-            btn = Button(text='Value %d' % index, size_hint_y=None, height=44)
-            btn.bind(on_release=lambda btn: dropdown.select(btn.text))
-            dropdown.add_widget(btn)
-        mainbutton = Button(text='Hello', size_hint=(None, None))
-        mainbutton.bind(on_release=dropdown.open)
-        dropdown.bind(on_select=lambda instance, x: setattr(mainbutton, 'text', x))
-        box.add_widget(mainbutton)
+        # create save button
+        save = MDIconButton(icon='content-save', on_release=self.save)
+        save.size_hint_x = 1
+
+        # create back button
+        back = MDIconButton(icon='arrow-left', on_release=self.change_screen)
+        back.size_hint_x = 1
+
+
+        # add controls to box
+        box.add_widget(ip)
+        box.add_widget(name)
+        box.add_widget(desc)
+
+        # add controls to toolbar box
+        toolbar_box.add_widget(back)
+        toolbar_box.add_widget(save)
+
+        # add toolbar box to toolbar box
+        box.add_widget(toolbar_box)
+
+    def change_screen(self,*args):
+        App.get_running_app().root.current = "ScreenIOTControl"
+    def save(self, *args):
+        # get the values from the text inputs
+        ip = self.ids.ip_id.text
+        name = self.ids.name.text
+        desc = self.ids.desc.text
+
+        # check if the ip is valid
+        try:
+            IP(ip)
+        except ValueError:
+            # show popup
+            popup = Popup(title='Error',
+                          content=Label(text='Invalid IP Address'),
+                          size_hint=(None, None), size=(400, 400))
+            popup.open()
+            return
+
+        # check if the name is valid
+        if name == "":
+            # show popup
+            popup = Popup(title='Error',
+                          content=Label(text='Invalid Device Name'),
+                          size_hint=(None, None), size=(400, 400))
+            popup.open()
 
 
 class ScreenIOTControl(Screen):
