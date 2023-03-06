@@ -3,16 +3,13 @@ import logging
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
-from kivy.graphics import Canvas
-from kivy.metrics import dp
 from kivy.properties import ObjectProperty
+from kivy.properties import StringProperty
 from kivy.storage.jsonstore import JsonStore  # use for storing data
-from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -20,7 +17,6 @@ from kivy.uix.textinput import TextInput
 from kivymd.app import MDApp
 from kivymd.uix.button import MDIconButton, MDRectangleFlatButton
 from kivymd.uix.card import MDCard
-from kivy.properties import StringProperty
 from kivymd.uix.label import MDLabel
 
 Label = MDLabel
@@ -529,13 +525,20 @@ class LunaApp(MDApp):
         App.get_running_app().theme_cls.theme_style = "Dark"
         # change buttons to red
         App.get_running_app().theme_cls.primary_palette = "Purple"
+
+          # check if devices already present if so, skip add device screen!
         self.root = Manager()
-        self.checkComplete()  # check if devices already present if so, skip add device screen!
         return self.root
+
+    def on_start(self):
+        # hopefully this fixes error!
+        self.checkComplete()
+        Clock.schedule_once(App.get_running_app().root.ids.screen_Add_id.assemble, 10)
+
 
     def checkComplete(self):
         devices_storage = JsonStore('devices.json')
-        Clock.schedule_once(App.get_running_app().root.ids.screen_Add_id.assemble, 1)
+
         if devices_storage:
             # print("AlreadyDone")
             self.root.splash_next = 'ScreenHome'
