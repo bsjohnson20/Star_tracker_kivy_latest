@@ -1,27 +1,22 @@
 import logging
 
-from IPy import IP
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
-from kivy.graphics import Canvas
-from kivy.metrics import dp
 from kivy.properties import ObjectProperty
+from kivy.properties import StringProperty
 from kivy.storage.jsonstore import JsonStore  # use for storing data
-from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.textinput import TextInput
 from kivymd.app import MDApp
-from kivymd.uix.button import MDIconButton
+from kivymd.uix.button import MDIconButton, MDRectangleFlatButton
 from kivymd.uix.card import MDCard
-from kivy.properties import StringProperty
 from kivymd.uix.label import MDLabel
 
 Label = MDLabel
@@ -135,7 +130,21 @@ class DeviceSettings(Screen):
 
         # check if the ip is valid
         try:
-            IP(ip)
+            # check if the ip is valid
+            ip = ip.split(".")
+            if len(ip) != 4:
+                raise ValueError
+            for i in ip:
+                if int(i) > 255 or int(i) < 0:
+                    raise ValueError
+            # save the data
+            settings_storage.put(name, ip=ip, desc=desc, LastOnline=0)
+            # show popup
+            popup = Popup(title='Success',
+                          content=Label(text='Device Saved'),
+                          size_hint=(None, None), size=(400, 400))
+            popup.open()
+            return
         except ValueError:
             # show popup
             popup = Popup(title='Error',
@@ -155,6 +164,13 @@ class DeviceSettings(Screen):
 
 class ScreenIOTControl(Screen):
     def loadPage(self, name, dev_type, **kwargs):
+        """
+        Load the page for the device type and device name with the data and controls.
+        :param name:
+        :param dev_type:
+        :param kwargs:
+        :return: screen
+        """
         # fetch name.text
         name
 
@@ -169,22 +185,41 @@ class ScreenIOTControl(Screen):
         self.ids.toolbar_box.clear_widgets()
 
         # create boxlayout
-        box = BoxLayout(orientation="vertical")
+        box = MDCard(orientation="vertical")
 
         # title label
-        box.add_widget(Label(text="Device Controls", size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
+        box.add_widget(Label(text="Device Controls", size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
 
         # add the controls to the boxlayout in another container
-        main_box = BoxLayout(orientation="vertical", spacing=10, padding=10, size_hint=(0.5, 0.5),
-                             pos_hint={'center_x': 0.5, 'center_y': 0.5})
-        main_box.add_widget(Label(text="Hello!"))
-        main_box.add_widget(Label(text=name))
-        main_box.add_widget(Label(text=devices_storage[name]["ip"]))
-        main_box.add_widget(Label(text=devices_storage[name]["desc"]))
-        main_box.add_widget(Label(text=devices_storage[name]["device_type"]))
+        main_box = BoxLayout(orientation="vertical", spacing=10, padding=10, size_hint=(1, 0.5),
+                             pos_hint={'center_x': 0, 'center_y': 0.5})
+        data = MDLabel(text=f"Hello and welcome to the {name} device controls page.\nIP: {devices_storage[name]['ip']}\nDescription: {devices_storage[name]['desc']}\nDevice Type: {devices_storage[name]['device_type']}", halign="center", size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        data.size_hint_y = 0.4
+        main_box.add_widget(data)
+
+        # controls:
+        # box
+        controls_box = BoxLayout(orientation="horizontal", spacing=10, padding=10, size_hint=(1, 0.5))
+        controls_box.size_hint_x =1
+        # actual
+        forw = MDRectangleFlatButton(text="forward", on_press=lambda x: print("Forward"))
+        forw.size_hint_x = 1
+        backw = MDRectangleFlatButton(text="backward", on_press=lambda x: print("Backward"))
+        backw.size_hint_x = 1
+        stop = MDRectangleFlatButton(text="stop", on_press=lambda x: print("Stop"))
+        stop.size_hint_x = 1
+
+        # add controls to box
+        controls_box.add_widget(forw)
+        controls_box.add_widget(stop)
+        controls_box.add_widget(backw)
+
+        # add controls box to main box
+        main_box.add_widget(controls_box)
+
 
         # set the size of the main box
-        main_box.size_hint = (0.5, 0.5)
+        main_box.size_hint = (1, 0.5)
         main_box.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
 
         # add the main box to the boxlayout
@@ -213,7 +248,29 @@ class ScreenAddDevice(Screen):
             popup.open()
         else:
             try:
-                IP(temp.ip_id.text)
+                if temp.dropdown_opener.text == "Select Device Type":
+                    # call popup
+                    self.popup("Please select a device type")
+                    return
+                # validate ip by converting to number and stripping decimals
+                try:
+                    ip = temp.ip_id.text.split(".")
+                    x = 0
+                    for i in ip:
+                        if int(i) > 255:
+                            raise ValueError
+                        else:
+                            x+=1
+                    if x != 4:
+                        raise ValueError
+                    ip = ".".join(ip)
+
+                except ValueError:
+                    # call popup
+                    self.popup("Invalid IP, check you formatted it with 4 sets of numbers between 0 and 255")
+                    return
+
+
                 devices_storage.put(temp.name.text, desc=temp.desc.text, ip=temp.ip_id.text,
                                     device_type=temp.dropdown_opener.text)
                 App.get_running_app().root.current = "ScreenHome"
@@ -225,6 +282,12 @@ class ScreenAddDevice(Screen):
                 box.add_widget(Label(text="Invalid IP"))
                 box.add_widget(Button(text="Close", on_press=popup.dismiss))
                 popup.open()
+    def popup(self, error, *args):
+        box = BoxLayout(orientation="vertical")
+        popup = Popup(title='Error', content=box, size_hint={0.4, 0.2})
+        box.add_widget(Label(text=error))
+        box.add_widget(Button(text="Close", on_press=popup.dismiss))
+        popup.open()
 
     def callback(self, text_item):
         print(text_item)
@@ -462,13 +525,20 @@ class LunaApp(MDApp):
         App.get_running_app().theme_cls.theme_style = "Dark"
         # change buttons to red
         App.get_running_app().theme_cls.primary_palette = "Purple"
+
+          # check if devices already present if so, skip add device screen!
         self.root = Manager()
-        self.checkComplete()  # check if devices already present if so, skip add device screen!
         return self.root
+
+    def on_start(self):
+        # hopefully this fixes error!
+        self.checkComplete()
+        Clock.schedule_once(App.get_running_app().root.ids.screen_Add_id.assemble, 10)
+
 
     def checkComplete(self):
         devices_storage = JsonStore('devices.json')
-        Clock.schedule_once(App.get_running_app().root.ids.screen_Add_id.assemble, 1)
+
         if devices_storage:
             # print("AlreadyDone")
             self.root.splash_next = 'ScreenHome'
