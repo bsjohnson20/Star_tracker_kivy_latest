@@ -1,5 +1,10 @@
 import logging
+import threading
+import time
+import socket
 
+import httpx as httpx
+import requests as requests
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
@@ -20,6 +25,7 @@ from kivymd.uix.button import MDIconButton, MDRectangleFlatButton
 from kivymd.uix.card import MDCard
 from kivymd.uix.label import MDLabel
 from kivymd.uix.menu import MDDropdownMenu
+import trio
 
 Label = MDLabel
 settings_storage = JsonStore('settings.json')
@@ -33,6 +39,8 @@ from kivy.config import Config
 # 0 being off 1 being on as in true / false
 # you can use 0 or 1 && True or False
 Config.set('graphics', 'resizable', '1')
+
+
 
 
 class ScreenWelcome(Screen):
@@ -163,8 +171,63 @@ class DeviceSettings(Screen):
                           size_hint=(None, None), size=(400, 400))
             popup.open()
 
+class OnlineCheck():
+    def __init__(self, ip, port, **kwargs):
+        super().__init__(**kwargs)
+        self.url = f"{ip}"
+        self.port = port
+        # self.url = "https://google.com"
+        self.timeout = 5
+        self.status = "waiting"
+
+    # check if online
+    def is_online(self):
+        try:
+            # create socket
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            # set timeout
+            s.settimeout(5)
+            # connect to socket
+            s.connect((self.url,self.port))
+            # close socket
+            s.close()
+
+            # if online return true
+            return True
+        except (requests.ConnectionError, requests.Timeout):
+            # if not online return false
+            print("not online")
+            return False
+        except (ConnectionAbortedError, ConnectionRefusedError):
+            print("not online")
+            return False
+
+class onlineButton(MDIconButton):
+    def __init__(self, name, **kwargs):
+        super().__init__(**kwargs)
+        self.icon = "wifi-strength-1"
+        self.name = name
+
+    def on_press(self):
+        # get ip address from device_storage
+        ip = devices_storage.get(self.name)['ip']
+        # run thread to check if online
+        self.thread = threading.Thread(target=self.check_online, args=(ip,))
+        self.thread.start()
+
+
+
+    def check_online(self, ip):
+        # check if online
+        if OnlineCheck(ip,5000).is_online():
+            self.parent.ids["status"].text = "online"
+        else:
+            self.parent.ids["status"].text = "offline"
+
+
 
 class ScreenIOTControl(Screen):
+
     def loadPage(self, name, dev_type, **kwargs):
         """
         Load the page for the device type and device name with the data and controls.
@@ -192,12 +255,43 @@ class ScreenIOTControl(Screen):
         # title label
         box.add_widget(Label(text="Device Controls", size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
 
+
+
         # add the controls to the boxlayout in another container
         main_box = BoxLayout(orientation="vertical", spacing=10, padding=10, size_hint=(1, 0.5),
                              pos_hint={'center_x': 0, 'center_y': 0.5})
+
+        # setup class for device
+        device_class = OnlineCheck(devices_storage[name]['ip'],port=5000)
+
+
+
         data = MDLabel(text=f"Hello and welcome to the {name} device controls page.\nIP: {devices_storage[name]['ip']}\nDescription: {devices_storage[name]['desc']}\nDevice Type: {devices_storage[name]['device_type']}", halign="center", size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+
+
+        # create boxlayout
+        box = MDCard(orientation="horizontal")
+        box.size_hint_x = 1
+        box.size_hint_y = 0.2
+
+        # add Label
+        stat= MDLabel(text="Status")
+        off = MDLabel(text="Offline")
+
+        online = onlineButton(name=name, on_press=device_class.is_online, size_hint=(0.1, 0.5),
+                              pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        online.size_hint_x = 0.1
+        online.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        box.ids['status'] = off
+        box.add_widget(stat)
+        box.add_widget(off)
+        box.add_widget(online)
+
+
+
         data.size_hint_y = 0.4
         main_box.add_widget(data)
+        main_box.add_widget(box)
 
         # controls:
         # box
@@ -552,7 +646,15 @@ class MeButton(MDIconButton):
 
 
 class LunaApp(MDApp):
-
+    def __init__(self, nursery,**kwargs):
+        super().__init__(**kwargs)
+        self.nursery = nursery
+        self.title = "Luna"
+        self.theme_cls.theme_style = "Dark"
+        self.theme_cls.primary_palette = "Purple"
+        self.theme_cls.accent_palette = "Purple"
+        self.theme_cls.primary_hue = "A700"
+        self.theme_cls.accent_hue = "A700"
     def build(self):
         """This method returns the Manager class"""
         self.theme_cls.theme_style = "Dark"
@@ -604,4 +706,13 @@ class ScreenCredits(Screen):
         print("ENTERED CREDITS SCREEN")
 
 if __name__ == "__main__":
-    LunaApp().run()
+
+    # Start kivy app as an asynchronous task
+    async def main() -> None:
+        async with trio.open_nursery() as nursery:
+            server = LunaApp(nursery)
+            await server.async_run("trio")
+            nursery.cancel_scope.cancel()
+
+
+    trio.run(main)
