@@ -3,6 +3,7 @@ import logging
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
+from kivy.metrics import dp
 from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
 from kivy.storage.jsonstore import JsonStore  # use for storing data
@@ -18,6 +19,7 @@ from kivymd.app import MDApp
 from kivymd.uix.button import MDIconButton, MDRectangleFlatButton
 from kivymd.uix.card import MDCard
 from kivymd.uix.label import MDLabel
+from kivymd.uix.menu import MDDropdownMenu
 
 Label = MDLabel
 settings_storage = JsonStore('settings.json')
@@ -235,7 +237,50 @@ class ScreenAddDevice(Screen):
         super().__init__(**kwargs)
 
     def on_enter(self, *args):
+        # fetch id for dropdown
+        dropdown_opener = App.get_running_app().root.ids.screen_Add_id.ids.dropdown_opener
+        # create dropdown
+        dropdown = MDDropdownMenu(
+            caller=dropdown_opener,
+            items=[
+                {
+                    "viewclass": "OneLineListItem",
+                    "text": "StrackerTrackerV1",
+                    "height": dp(56),
+                    "on_release": lambda x=f"StarTrackerV1": self.callback(x,dropdown),
+                },
+                {
+                    "viewclass": "OneLineListItem",
+                    "text": "StrackerTrackerV2",
+                    "height": dp(56),
+                    "on_release": lambda x=f"StrackerTrackerV2": self.callback(x,dropdown),
+                },
+                {
+                    "viewclass": "OneLineListItem",
+                    "text": "StrackerTrackerV3",
+                    "height": dp(56),
+                    "on_release": lambda x=f"StrackerTrackerV3": self.callback(x,dropdown),
+                    }
+            ],
+            width_mult=4,
+        )
+        # bind on release to open the dropdown
+        dropdown_opener.bind(on_release=lambda a: dropdown.open())
+
+
+
         print("Nothing to see here!")
+        """menu_items = [{"text": f"Item {i}"} for i in range(5)]
+        dropdown = MDDropdownMenu(
+            caller=App.get_running_app().root.ids.screen_Add_id.ids.dropdown_opener,
+            items=menu_items,
+            position="center",
+            callback=self.callback
+        )
+
+        # bind on release to open the dropdown
+
+        App.get_running_app().root.ids.screen_Add_id.ids.dropdown_opener.bind(on_release=dropdown.open)"""
 
     def Validate(self, *args, **kwargs):
         temp = App.get_running_app().root.ids.screen_Add_id.ids
@@ -289,26 +334,17 @@ class ScreenAddDevice(Screen):
         box.add_widget(Button(text="Close", on_press=popup.dismiss))
         popup.open()
 
-    def callback(self, text_item):
+    def callback(self, text_item,dropdown):
         print(text_item)
+        drop = App.get_running_app().root.ids.screen_Add_id.ids.dropdown_opener
+        drop.text = text_item
+        # close the dropdown
+        dropdown.dismiss()
 
     def assemble(self, *args):
-        print("Assembling STARTED")
-        dropdown = DropDown()
+        pass
 
-        device_types = [
-            "StarTrackerV1",
-            "StarTrackerv2",
-            "StarTrackerV3"
-        ]
-        for item in device_types:
-            btn = Button(text='%s' % item, size_hint_y=None, height=44)
-            btn.bind(on_release=lambda btn: dropdown.select(btn.text))
-            dropdown.add_widget(btn)
-            print(f"Assembling: {btn}. {item}")
-        self.ids.dropdown_opener.bind(on_release=dropdown.open)
-        print(self.ids.dropdown_opener)
-        dropdown.bind(on_select=lambda instance, x: setattr(self.ids.dropdown_opener, 'text', x))
+
 
 
 class OpenerButton(MDIconButton):
@@ -533,7 +569,7 @@ class LunaApp(MDApp):
     def on_start(self):
         # hopefully this fixes error!
         self.checkComplete()
-        Clock.schedule_once(App.get_running_app().root.ids.screen_Add_id.assemble, 10)
+
 
 
     def checkComplete(self):
