@@ -1,12 +1,10 @@
 import logging
-import threading
-import time
 import socket
+import threading
 
-import httpx as httpx
 import requests as requests
+import trio
 from kivy.app import App
-from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.metrics import dp
 from kivy.properties import ObjectProperty
@@ -14,7 +12,6 @@ from kivy.properties import StringProperty
 from kivy.storage.jsonstore import JsonStore  # use for storing data
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
-from kivy.uix.dropdown import DropDown
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
@@ -25,7 +22,6 @@ from kivymd.uix.button import MDIconButton, MDRectangleFlatButton
 from kivymd.uix.card import MDCard
 from kivymd.uix.label import MDLabel
 from kivymd.uix.menu import MDDropdownMenu
-import trio
 
 Label = MDLabel
 settings_storage = JsonStore('settings.json')
@@ -144,6 +140,17 @@ class DeviceSettings(Screen):
             ip = ip.split(".")
             if len(ip) != 4:
                 raise ValueError
+            elif ip[0] == "0":
+                raise ValueError
+            # check for empty values
+            elif "" in ip or "" in name or "" in desc:
+                # call popup to show error
+                popup = Popup(title='Error',
+                              content=Label(text='Empty Values'),
+                              size_hint=(None, None), size=(400, 400),
+                              auto_dismiss=True)
+                popup.open()
+                return
             for i in ip:
                 if int(i) > 255 or int(i) < 0:
                     raise ValueError
@@ -163,13 +170,8 @@ class DeviceSettings(Screen):
             popup.open()
             return
 
-        # check if the name is valid
-        if name == "":
-            # show popup
-            popup = Popup(title='Error',
-                          content=Label(text='Invalid Device Name'),
-                          size_hint=(None, None), size=(400, 400))
-            popup.open()
+
+
 
 class OnlineCheck():
     def __init__(self, ip, port, **kwargs):
@@ -205,7 +207,7 @@ class OnlineCheck():
 class onlineButton(MDIconButton):
     def __init__(self, name, **kwargs):
         super().__init__(**kwargs)
-        self.icon = "wifi-strength-1"
+        self.icon = "refresh"
         self.name = name
 
     def on_press(self):
@@ -324,6 +326,29 @@ class ScreenIOTControl(Screen):
         # add toolbar to root
         self.ids.toolbar_box.add_widget(IOT_toolbar())
 
+class ValidatingTool:
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def empty_data(self, *args): # check if data is empty
+        for item in args:
+            if item == "":
+                return True # return true because empty data
+        # return false if no empty data and close function
+        return False
+
+    def checkIP(self, ip): # check if ip is valid
+        try:
+            socket.inet_aton(ip)
+            return True
+        except:
+            return False
+
+    def checkDevType(self, dev_type): # check if device type is valid
+        if dev_type == "Choose Device Type":
+            return True
+        else:
+            return False
 
 class ScreenAddDevice(Screen):
     def __init__(self, **kwargs):
@@ -363,64 +388,33 @@ class ScreenAddDevice(Screen):
 
 
 
-        print("Nothing to see here!")
-        """menu_items = [{"text": f"Item {i}"} for i in range(5)]
-        dropdown = MDDropdownMenu(
-            caller=App.get_running_app().root.ids.screen_Add_id.ids.dropdown_opener,
-            items=menu_items,
-            position="center",
-            callback=self.callback
-        )
-
-        # bind on release to open the dropdown
-
-        App.get_running_app().root.ids.screen_Add_id.ids.dropdown_opener.bind(on_release=dropdown.open)"""
 
     def Validate(self, *args, **kwargs):
+        # so much validation :(
+
         temp = App.get_running_app().root.ids.screen_Add_id.ids
         # Check if nothing inputted or item already in dict
-        if temp.ip_id.text == '' or temp.name.text == '' or temp.name.text in devices_storage:
-            box = BoxLayout(orientation="vertical")
-            popup = Popup(title='Error', content=box, size_hint={0.4, 0.2})
-            box.add_widget(Label(text="Missing data or already in database"))
-            box.add_widget(Button(text="Close", on_press=popup.dismiss))
-            popup.open()
+
+        # check if any data is empty
+        # check if dev type is not unselcted
+        # check if ip is valid
+        # check if name is already in dict
+        if ValidatingTool.empty_data(self, temp.name.text, temp.ip_id.text, temp.desc.text):
+            self.popup("Please fill in all fields")
+        elif ValidatingTool.checkDevType(self, temp.dropdown_opener.text):
+            self.popup("Please select a device type")
+        elif ValidatingTool.checkIP(self, temp.ip_id.text):
+            self.popup("Please enter a valid IP")
+        elif temp.name.text in devices_storage:
+            self.popup("Name already in use")
         else:
-            try:
-                if temp.dropdown_opener.text == "Select Device Type":
-                    # call popup
-                    self.popup("Please select a device type")
-                    return
-                # validate ip by converting to number and stripping decimals
-                try:
-                    ip = temp.ip_id.text.split(".")
-                    x = 0
-                    for i in ip:
-                        if int(i) > 255:
-                            raise ValueError
-                        else:
-                            x+=1
-                    if x != 4:
-                        raise ValueError
-                    ip = ".".join(ip)
-
-                except ValueError:
-                    # call popup
-                    self.popup("Invalid IP, check you formatted it with 4 sets of numbers between 0 and 255")
-                    return
+            # add to dict
+            devices_storage.put(temp.name.text, desc=temp.desc.text, ip=temp.ip_id.text,
+                                device_type=temp.dropdown_opener.text)
+            App.get_running_app().root.current = "ScreenHome"
+            App.get_running_app().root.ids.screen_Home_id.setup()
 
 
-                devices_storage.put(temp.name.text, desc=temp.desc.text, ip=temp.ip_id.text,
-                                    device_type=temp.dropdown_opener.text)
-                App.get_running_app().root.current = "ScreenHome"
-                App.get_running_app().root.ids.screen_Home_id.setup()
-            except ValueError:
-
-                box = BoxLayout(orientation="vertical")
-                popup = Popup(title='Error', content=box, size_hint={0.4, 0.2})
-                box.add_widget(Label(text="Invalid IP"))
-                box.add_widget(Button(text="Close", on_press=popup.dismiss))
-                popup.open()
     def popup(self, error, *args):
         box = BoxLayout(orientation="vertical")
         popup = Popup(title='Error', content=box, size_hint={0.4, 0.2})
