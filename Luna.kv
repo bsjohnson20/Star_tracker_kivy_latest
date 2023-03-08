@@ -127,6 +127,14 @@
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: 0.1
+
+            canvas:
+                Color:
+                    # make it purple
+                    rgba: 0.75, 0, 0.5, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
             MDIconButton:
                 size_hint_x: 1
                 text: "Back"
@@ -164,6 +172,7 @@
                 halign:"center"
             # Cards go here - build a generator for them...
             ScrollView:
+
                 size_hint_x: 1
 
                 StackLayout:
@@ -198,12 +207,21 @@
             pos_hint: {"center_x": .5, "center_y": .5}
 
         BoxLayout:
-            id: toolbar_box
-            # scale toolbar to 10% of screen height
             size_hint_y: 0.1
+            size_hint_x: 1
+            id: toolbar_box
+            canvas:
+                Color:
+                    # make it purple
+                    rgba: 0.75, 0, 0.5, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            # scale toolbar to 10% of screen height
+            IOT_toolbar:
+
 
             # scale x to 100% of screen width
-            size_hint_x: 1
 <ScreenCredits>:
     BoxLayout:
         orientation: 'vertical'
@@ -235,7 +253,74 @@
 
 
 
-<DeviceSettings>
+<DeviceSettings>:
+    on_enter:
+        # update self variables by copying the values from ScreenIOTControl
+        self.name = self.parent.ids.screen_IOTControl_id.ids.name.text
+        self.desc = self.parent.ids.screen_IOTControl_id.ids.desc.text
+        self.ip = self.parent.ids.screen_IOTControl_id.ids.ip.text
+
+        # update the text inputs
+        self.ids.nameInput.text = self.name
+        self.ids.descInput.text = self.desc
+        self.ids.ipInput.text = self.ip
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+
+            size_hint_y: 0.1
+            orientation: 'horizontal'
+            MDLabel:
+                text: "Star Tracker Device Settings"
+                size_hint_y: 0.1
+                halign:"center"
+        BoxLayout:
+            id: labels_box
+            orientation: 'vertical'
+            size_hint_y: 0.9
+            # name, desc and IP labels
+            GridLayout:
+                id: deviceSettings_grid
+                padding: 20
+                spacing: 20
+                cols: 2
+                MDLabel:
+                    text: "Name"
+                TextInput:
+                    id: nameInput
+                    text: root.name
+                MDLabel:
+                    text: "Desc"
+                TextInput:
+                    id: descInput
+                    text: root.desc
+                MDLabel:
+                    text: "IP"
+                TextInput:
+                    id: ipInput
+                    text: root.ip
+
+
+
+        BoxLayout: # toolbar
+            orientation: 'horizontal'
+            size_hint_y: 0.1
+            MDIconButton:
+                size_hint_x: 1
+                text: "Back"
+                on_release:
+                    root.manager.current = "ScreenIOTControl"
+                    root.manager.last_screen = "DeviceSettings"
+                icon: "arrow-left"
+            # Save button
+            MDIconButton:
+                size_hint_x: 1
+                text: "Save"
+                icon: "content-save"
+                on_release:
+                    # fetch ids for text inputs
+                    root.save(name=self.parent.parent.parent.ids.nameInput.text, desc=self.parent.parent.parent.ids.descInput.text, ip=self.parent.parent.parent.ids.ipInput.text)
+
 
 <ScreenAboutMe>:
     BoxLayout:
@@ -244,7 +329,7 @@
             size_hint_y: 0.1
             orientation: 'horizontal'
             MDLabel:
-                text: "Star Tracker About Me"
+                text: "Star Tracker Settings"
                 size_hint_y: 0.1
                 halign:"center"
             MDIconButton:
@@ -285,9 +370,17 @@
 
 
 
+
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: 0.1
+            canvas:
+                Color:
+                    # make it purple
+                    rgba: 0.75, 0, 0.5, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
             MDIconButton:
                 size_hint_x: 1
                 text: "Back"
