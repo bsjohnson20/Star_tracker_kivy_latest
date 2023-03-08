@@ -19,7 +19,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.textinput import TextInput
 from kivymd.app import MDApp
 from kivymd.uix.button import MDIconButton, MDRectangleFlatButton
-from kivymd.uix.card import MDCard
+from kivymd.uix.card import MDCard, MDCardSwipe
 from kivymd.uix.label import MDLabel
 from kivymd.uix.menu import MDDropdownMenu
 
@@ -541,13 +541,10 @@ class ScreenHome(Screen):
 
             # create THE Box this'll contain labels and the buton to open the corresponding IOT panel
             Box = DeviceCard(item, dev_type, size_hint_y=None, height=200, pos_hint={'center_x': 0.5, 'center_y': 0.5})
+            # add color to Box
+            # make it pretty
+            Box.color = (0.5, 0, 0.5, 1)
             Box.padding = 16
-
-            # add canvas to box
-            with Box.canvas.before:
-                Color(0.75, 0, 0.75, 1)
-                self.rect = Rectangle(size=Box.size, pos=Box.pos)
-
 
             # set size and width to exactly half of window size
             Box.size_hint_x = 0.5
@@ -563,6 +560,10 @@ class ScreenHome(Screen):
             # add OpenerButton to Box
 
             self.add_widget(Box)
+
+    # update rectangle position and size
+    def _update_rect(self, instance, value, *args):
+        self.rect.size = instance.size
     #
 
     def IOTOpener(self, device_type):
@@ -574,7 +575,7 @@ class ScreenMain(Screen): # this is the main screen, it is the first screen that
 
 
 # testing
-class DeviceCard(MDCard): # this one stores the name, desc, ip and type of the device, and a button to open the IOT panel for it. Probably...
+class DeviceCard(MDCardSwipe): # this one stores the name, desc, ip and type of the device, and a button to open the IOT panel for it. Probably...
     text = StringProperty
 
     def __init__(self, name, dev_type, **kwargs):
