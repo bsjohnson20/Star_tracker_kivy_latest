@@ -79,6 +79,7 @@ class IOT_toolbar(BoxLayout):
         logging.debug("Going back to home screen")
 
     def settings(self, *args):
+        logging.debug("Going to settings screen")
         App.get_running_app().root.current = "DeviceSettings"
         # debug log using logging module
         logging.debug("Going to settings screen")
@@ -93,15 +94,15 @@ class DeviceSettings(Screen):
         box = BoxLayout(orientation="vertical")
         self.add_widget(box)
 
-        # create text label and input
-        name = TextInput(hint_text="Device Name", multiline=False)
-        desc = TextInput(hint_text="Device Description", multiline=False)
-        ip = TextInput(hint_text="IP Address", multiline=False)
+        # create 3 text inputs and set their text to the values from the IOT_screen
+        name = TextInput(text=self.name, multiline=False, size_hint_y=None, height=dp(50))
+        desc = TextInput(text=self.desc, multiline=False, size_hint_y=None, height=dp(50))
+        ip = TextInput(text=self.ip, multiline=False, size_hint_y=None, height=dp(50))
 
         # give ids
-        self.ids.name = name
-        self.ids.desc = desc
-        self.ids.ip_id = ip
+        self.ids.nameLab = name.text
+        self.ids.descLab = desc.text
+        self.ids.ip_idLab = ip.text
 
         # create toolbar boxlayout
         toolbar_box = BoxLayout(orientation="horizontal")
@@ -127,7 +128,27 @@ class DeviceSettings(Screen):
         box.add_widget(toolbar_box)
 
     def change_screen(self,*args):
-        App.get_running_app().root.current = "ScreenIOTControl"
+        App.get_running_app().root.current = "ScreenHome"
+
+    def on_enter(self, *args):
+        # fetch name, desc, ip from IOT_screen
+        print("Crash here?")
+        #
+        print(ScreenIOTControl.fetchvalues(self))
+
+        #self.name = App.get_running_app().root.ids.ScreenIOTControl.ids['name']
+        self.name = ' test '
+        print(f"self.name: {self.name}")
+
+        # log values
+        logging.debug(f"Name: {self.name}")
+        logging.debug(f"Desc: {self.desc}")
+        logging.debug(f"IP: {self.ip}")
+
+        # set the text of the text inputs to the values from the IOT_screen
+        self.ids.nameLab = self.name
+        self.ids.descLab = self.desc
+        self.ids.ip_idLab = self.ip
     def save(self, *args):
         # get the values from the text inputs
         ip = self.ids.ip_id.text
@@ -244,7 +265,7 @@ class ScreenIOTControl(Screen):
         # load the page for the device type and device name with the data and controls.
         App.get_running_app().root.current = 'ScreenIOTControl'
         # devices_storage[caller_name]
-        print(f"name: {name}, dev_type: {dev_type}")
+        logging.debug(f"name: {name}, dev_type: {dev_type}")
 
         # clear the boxlayout
         self.ids.iotcontrol_box.clear_widgets()
@@ -266,6 +287,26 @@ class ScreenIOTControl(Screen):
         # setup class for device
         device_class = OnlineCheck(devices_storage[name]['ip'],port=5000)
 
+
+        # create Card
+        rootCard = MDCard(orientation="vertical", size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+
+        # add Labels
+
+        rootCard.add_widget(box)
+        box = GridLayout(cols=2, size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        box.add_widget(MDLabel(text="Device Name", size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
+        # add name
+        box.add_widget(MDLabel(text=name, size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
+        box.add_widget(MDLabel(text="Description", size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
+        # add description
+        box.add_widget(MDLabel(text=devices_storage[name]['desc'], size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
+        box.add_widget(MDLabel(text="IP Address", size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
+        # add ip address
+        box.add_widget(MDLabel(text=devices_storage[name]['ip'], size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
+        box.add_widget(MDLabel(text="Device Type", size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
+        # add device type
+        box.add_widget(MDLabel(text=devices_storage[name]['device_type'], size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
 
 
         data = MDLabel(text=f"Hello and welcome to the {name} device controls page.\nIP: {devices_storage[name]['ip']}\nDescription: {devices_storage[name]['desc']}\nDevice Type: {devices_storage[name]['device_type']}", halign="center", size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5})
@@ -289,10 +330,16 @@ class ScreenIOTControl(Screen):
         box.add_widget(off)
         box.add_widget(online)
 
+        # card for wifi status
+        wifi = MDCard(orientation="horizontal", size_hint=(1, 0.1), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        main_box.add_widget(wifi)
+
+        wifi.ids['status'] = off
+        wifi.add_widget(stat)
+        wifi.add_widget(off)
+        wifi.add_widget(online)
 
 
-        data.size_hint_y = 0.4
-        main_box.add_widget(data)
         main_box.add_widget(box)
 
         # controls:
@@ -333,22 +380,30 @@ class ValidatingTool:
     def empty_data(self, *args): # check if data is empty
         for item in args:
             if item == "":
-                return True # return true because empty data
+                return False # return true because empty data
         # return false if no empty data and close function
-        return False
+        return True
 
     def checkIP(self, ip): # check if ip is valid
         try:
             socket.inet_aton(ip)
+            # valid
             return True
         except:
+            # invalid
             return False
 
     def checkDevType(self, dev_type): # check if device type is valid
         if dev_type == "Choose Device Type":
-            return True
-        else:
             return False
+        else:
+            return True # return true if valid
+
+"""print(ValidatingTool.checkIP('', ip="192.168.0.1"))
+print(ValidatingTool.checkIP('', ip="1.1.1.1"))
+while True:
+    pass
+"""
 
 class ScreenAddDevice(Screen):
     def __init__(self, **kwargs):
@@ -399,11 +454,11 @@ class ScreenAddDevice(Screen):
         # check if dev type is not unselcted
         # check if ip is valid
         # check if name is already in dict
-        if ValidatingTool.empty_data(self, temp.name.text, temp.ip_id.text, temp.desc.text):
+        if not ValidatingTool.empty_data(self, temp.name.text, temp.ip_id.text, temp.desc.text):
             self.popup("Please fill in all fields")
-        elif ValidatingTool.checkDevType(self, temp.dropdown_opener.text):
+        elif not ValidatingTool.checkDevType(self, temp.dropdown_opener.text):
             self.popup("Please select a device type")
-        elif ValidatingTool.checkIP(self, temp.ip_id.text):
+        elif not ValidatingTool.checkIP(self, temp.ip_id.text):
             self.popup("Please enter a valid IP")
         elif temp.name.text in devices_storage:
             self.popup("Name already in use")
@@ -423,7 +478,7 @@ class ScreenAddDevice(Screen):
         popup.open()
 
     def callback(self, text_item,dropdown):
-        print(text_item)
+        logging.debug(text_item)
         drop = App.get_running_app().root.ids.screen_Add_id.ids.dropdown_opener
         drop.text = text_item
         # close the dropdown
@@ -468,7 +523,7 @@ class ScreenHome(Screen):
         for child in [child for child in
                       self.children]:  # clear screen - this lets us update the screen as well! - no this isn't a lazy workaround so I don't have to append instead... and write a new builder
             self.remove_widget(child)
-        print(devices_storage.count())
+        logging.debug(devices_storage.count())
         for item in devices_storage:
             print(item)
             new = codeinpain(item, devices_storage[item]['device_type'])
@@ -510,7 +565,7 @@ class ScreenHome(Screen):
             x.add_widget(type_lab)
             x.add_widget(dev_type)
 
-            print("I am", self)
+            logging.debug("I am", self)
 
             # x
             self.parent.item = item
@@ -527,8 +582,8 @@ class ScreenHome(Screen):
             # debug button
 
             # clickable image
-            print("BINDING TO " + self.parent.item + " " + devices_storage[item]['device_type'])
-            print(name_label.text)
+            logging.debug("BINDING TO " + self.parent.item + " " + devices_storage[item]['device_type'])
+            logging.debug(name_label.text)
 
             # add OpenerButton to Box
 
@@ -624,7 +679,7 @@ class AddButton(MDIconButton):
         # self.size = (50, 50)
         self.on_release = changeScreenAdd
         self.background = "black"
-        print(self.size)
+        logging.debug(self.size)
 
 
 class MeButton(MDIconButton):
@@ -697,7 +752,7 @@ class LunaApp(MDApp):
 
 class ScreenCredits(Screen):
     def on_enter(self, *args):
-        print("ENTERED CREDITS SCREEN")
+        logging.debug("ENTERED CREDITS SCREEN")
 
 if __name__ == "__main__":
 
