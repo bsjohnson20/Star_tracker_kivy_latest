@@ -36,7 +36,11 @@ from kivy.config import Config
 # you can use 0 or 1 && True or False
 Config.set('graphics', 'resizable', '1')
 
+# setup log for debugging
+logging.basicConfig(filename='debug.log', level=logging.DEBUG, format='%(asctime)s:%(levelname)s:%(message)s')
 
+# test log
+logging.debug('Started program')
 
 
 class ScreenWelcome(Screen):
@@ -80,15 +84,20 @@ class IOT_toolbar(BoxLayout):
 
     def settings(self, *args):
         logging.debug("Going to settings screen")
-        App.get_running_app().root.current = "DeviceSettings"
-        # debug log using logging module
-        logging.debug("Going to settings screen")
+        print(f"Log self: {self}, args: {args}")
+
+        # set screen to DeviceSettings
+        self.parent.parent.parent.manager.current = "DeviceSettings"
 
 
 # DeviceSettings page
 class DeviceSettings(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        self.name = ''
+        self.desc = ''
+        self.ip = ''
 
         # create boxlayout
         box = BoxLayout(orientation="vertical")
@@ -100,9 +109,9 @@ class DeviceSettings(Screen):
         ip = TextInput(text=self.ip, multiline=False, size_hint_y=None, height=dp(50))
 
         # give ids
-        self.ids.nameLab = name.text
-        self.ids.descLab = desc.text
-        self.ids.ip_idLab = ip.text
+        self.ids.nameLab = name
+        self.ids.descLab = desc
+        self.ids.ip_idLab = ip
 
         # create toolbar boxlayout
         toolbar_box = BoxLayout(orientation="horizontal")
@@ -116,9 +125,9 @@ class DeviceSettings(Screen):
         back.size_hint_x = 1
 
         # add controls to box
-        box.add_widget(ip)
         box.add_widget(name)
         box.add_widget(desc)
+        box.add_widget(ip)
 
         # add controls to toolbar box
         toolbar_box.add_widget(back)
@@ -127,18 +136,16 @@ class DeviceSettings(Screen):
         # add toolbar box to toolbar box
         box.add_widget(toolbar_box)
 
-    def change_screen(self,*args):
-        App.get_running_app().root.current = "ScreenHome"
+    def change_screen(self, *args):
+        self.manager.current = "ScreenIOTControl"
 
     def on_enter(self, *args):
         # fetch name, desc, ip from IOT_screen
-        print("Crash here?")
-        #
-        print(ScreenIOTControl.fetchvalues(self))
+        print("LOADED IOTSCREEN_ENTER COMMAND?")
+        # use fetchValues to get the values from the IOT_screen
 
-        #self.name = App.get_running_app().root.ids.ScreenIOTControl.ids['name']
-        self.name = ' test '
-        print(f"self.name: {self.name}")
+        # below line is not working fuck me
+        name, dev_type, ip, desc = fetchvalues()
 
         # log values
         logging.debug(f"Name: {self.name}")
@@ -146,52 +153,77 @@ class DeviceSettings(Screen):
         logging.debug(f"IP: {self.ip}")
 
         # set the text of the text inputs to the values from the IOT_screen
-        self.ids.nameLab = self.name
-        self.ids.descLab = self.desc
-        self.ids.ip_idLab = self.ip
+        self.ids.nameLab.text = name
+        self.ids.descLab.text = desc
+        self.ids.ip_idLab.text = ip
+
     def save(self, *args):
-        # get the values from the text inputs
-        ip = self.ids.ip_id.text
-        name = self.ids.name.text
-        desc = self.ids.desc.text
+        # get the text from the text inputs
+        new_name = self.ids.nameLab.text
+        new_desc = self.ids.descLab.text
+        new_ip = self.ids.ip_idLab.text
 
-        # check if the ip is valid
-        try:
-            # check if the ip is valid
-            ip = ip.split(".")
-            if len(ip) != 4:
-                raise ValueError
-            elif ip[0] == "0":
-                raise ValueError
-            # check for empty values
-            elif "" in ip or "" in name or "" in desc:
-                # call popup to show error
-                popup = Popup(title='Error',
-                              content=Label(text='Empty Values'),
-                              size_hint=(None, None), size=(400, 400),
-                              auto_dismiss=True)
-                popup.open()
-                return
-            for i in ip:
-                if int(i) > 255 or int(i) < 0:
-                    raise ValueError
-            # save the data
-            settings_storage.put(name, ip=ip, desc=desc, LastOnline=0)
-            # show popup
-            popup = Popup(title='Success',
-                          content=Label(text='Device Saved'),
-                          size_hint=(None, None), size=(400, 400))
-            popup.open()
+        # log values
+        logging.debug(f"New Name: {new_name}")
+        logging.debug(f"New Desc: {new_desc}")
+        logging.debug(f"New IP: {new_ip}")
+
+        # validate using ValidatingTool
+        if not ValidatingTool.checkIP(self, ip=new_ip):
+            logging.debug("Invalid IP")
+            # summon popup
+            popup("Invalid IP", "Please enter a valid IP in format num.num.num.num")
             return
-        except ValueError:
-            # show popup
-            popup = Popup(title='Error',
-                          content=Label(text='Invalid IP Address'),
-                          size_hint=(None, None), size=(400, 400))
-            popup.open()
+        elif not ValidatingTool.empty_data(self, new_name, new_desc, new_ip):
+            logging.debug("Invalid Name")
+            # summon popup
+            popup("Invalid Name", "Please ensure all fields are filled")
             return
+        else:
+            # set the values in IOT_screen
+            self.name, self.desc, self.ip = new_name, new_desc, new_ip
+            logging.debug("Saved")
+
+            # update IOT_screen
+            # write a huge Error here
+            #
+
+            # _______ .______      .______        ______   .______          __    __   _______ .______       _______
+            # |   ____||   _  \     |   _  \      /  __  \  |   _  \        |  |  |  | |   ____||   _  \     |   ____|
+            # |  |__   |  |_)  |    |  |_)  |    |  |  |  | |  |_)  |       |  |__|  | |  |__   |  |_)  |    |  |__
+            # |   __|  |      /     |      /     |  |  |  | |      /        |   __   | |   __|  |      /     |   __|
+            # |  |____ |  |\  \----.|  |\  \----.|  `--'  | |  |\  \----.   |  |  |  | |  |____ |  |\  \----.|  |____
+            # |_______|| _| `._____|| _| `._____| \______/  | _| `._____|   |__|  |__| |_______|| _| `._____||_______|
+
+            # WORKS FINE THE FIRST TIME THEN DECIDED AH YES WE SHALL NOT WORK AGAIN. LIKE HOW ELSE AM I GOING TO UPDATE THE SETTING????
+            # THIS IS PAIN!!!!!!!!! I'VE ALREADY HAD TO FIX THIS ERROR BEFORE BUT THIS TIME I DONT KNOW HOW I CAN DO THIS :(
+            updateScreenIOTControl(new_name, new_desc, new_ip)
+
+            # The 3 lines above are pure pain. I have no idea why they dont work. I've tried everything. I've tried using the ids from the IOT_screen
+            # THe only alternative is scheduling a task to update the IOT_screen but that is not a good solution. I need to find a way to update the IOT_screen
+            # without having to change the screen. I've tried using the self.manager.current = "ScreenIOTControl" but that doesnt work either. I've tried.
+            # Just crashes the app. I've tried using the self.manager.get_screen('ScreenIOTControl').ids['name'].text = new_name but that doesnt work either.
+            # Also crashes the app. I love coding. I love it so much. I love it so much that I want to cry. I love it so much that I want to die. I love it so much
+
+            # ai is a pain. But very stupid.
 
 
+            # change screen
+            self.manager.current = "ScreenIOTControl"
+def updateScreenIOTControl(new_name, new_desc, new_ip):
+    App.get_running_app().root.get_screen('ScreenIOTControl').ids['name'].text = new_name
+    App.get_running_app().root.ids['screen_IOTControl_id'].ids['desc'].text = new_desc
+    App.get_running_app().root.ids['screen_IOTControl_id'].ids['ip'].text = new_ip
+
+
+def fetchvalues():
+    # fetch values from the IOT screen
+    name = App.get_running_app().root.ids['screen_IOTControl_id'].ids['name'].text
+    dev_type = App.get_running_app().root.ids['screen_IOTControl_id'].ids['dev_type'].text
+    ip = App.get_running_app().root.ids['screen_IOTControl_id'].ids['ip'].text
+    desc = App.get_running_app().root.ids['screen_IOTControl_id'].ids['desc'].text
+    print(f"values")
+    return name, dev_type, ip, desc
 
 
 class OnlineCheck():
@@ -211,7 +243,7 @@ class OnlineCheck():
             # set timeout
             s.settimeout(5)
             # connect to socket
-            s.connect((self.url,self.port))
+            s.connect((self.url, self.port))
             # close socket
             s.close()
 
@@ -224,6 +256,7 @@ class OnlineCheck():
         except (ConnectionAbortedError, ConnectionRefusedError):
             print("not online")
             return False
+
 
 class onlineButton(MDIconButton):
     def __init__(self, name, **kwargs):
@@ -238,18 +271,23 @@ class onlineButton(MDIconButton):
         self.thread = threading.Thread(target=self.check_online, args=(ip,))
         self.thread.start()
 
-
-
     def check_online(self, ip):
         # check if online
-        if OnlineCheck(ip,5000).is_online():
+        if OnlineCheck(ip, 5000).is_online():
             self.parent.ids["status"].text = "online"
         else:
             self.parent.ids["status"].text = "offline"
 
 
-
 class ScreenIOTControl(Screen):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # create object properties
+        self.name = ""
+        self.dev_type = ""
+        self.ip = ""
+        self.desc = ""
 
     def loadPage(self, name, dev_type, **kwargs):
         """
@@ -263,7 +301,7 @@ class ScreenIOTControl(Screen):
         name
 
         # load the page for the device type and device name with the data and controls.
-        App.get_running_app().root.current = 'ScreenIOTControl'
+        # App.get_running_app().root.current = 'ScreenIOTControl'
         # devices_storage[caller_name]
         logging.debug(f"name: {name}, dev_type: {dev_type}")
 
@@ -273,79 +311,69 @@ class ScreenIOTControl(Screen):
         self.ids.toolbar_box.clear_widgets()
 
         # create boxlayout
-        box = MDCard(orientation="vertical")
+        box = BoxLayout(orientation="vertical", spacing=10, padding=10, size_hint=(1, 1))
 
         # title label
         box.add_widget(Label(text="Device Controls", size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
-
-
 
         # add the controls to the boxlayout in another container
         main_box = BoxLayout(orientation="vertical", spacing=10, padding=10, size_hint=(1, 0.5),
                              pos_hint={'center_x': 0, 'center_y': 0.5})
 
         # setup class for device
-        device_class = OnlineCheck(devices_storage[name]['ip'],port=5000)
+        device_class = OnlineCheck(devices_storage[name]['ip'], port=5000)
 
+        # Create the info screen part
+        # create card for device info
+        info = MDCard(orientation="vertical", size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        # add card to boxlayout
+        main_box.add_widget(info)
 
-        # create Card
-        rootCard = MDCard(orientation="vertical", size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        # add gridlayout to info
+        info_grid = GridLayout(cols=2, spacing=10, padding=10, size_hint=(1, 1))
+        info.add_widget(info_grid)
 
-        # add Labels
+        # add labels to gridlayout
+        info_grid.add_widget(Label(text="Name"))
+        nam = Label(text=name)
+        info_grid.add_widget(nam)
+        info_grid.add_widget(Label(text="Type"))
+        devType = Label(text=dev_type)
+        info_grid.add_widget(devType)
+        info_grid.add_widget(Label(text="IP"))
+        ip_lab = Label(text=devices_storage[name]['ip'])
+        info_grid.add_widget(ip_lab)
+        desc = Label(text="Description")
+        info_grid.add_widget(desc)
+        info_grid.add_widget(Label(text=devices_storage[name]['desc']))
 
-        rootCard.add_widget(box)
-        box = GridLayout(cols=2, size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5})
-        box.add_widget(MDLabel(text="Device Name", size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
-        # add name
-        box.add_widget(MDLabel(text=name, size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
-        box.add_widget(MDLabel(text="Description", size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
-        # add description
-        box.add_widget(MDLabel(text=devices_storage[name]['desc'], size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
-        box.add_widget(MDLabel(text="IP Address", size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
-        # add ip address
-        box.add_widget(MDLabel(text=devices_storage[name]['ip'], size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
-        box.add_widget(MDLabel(text="Device Type", size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
-        # add device type
-        box.add_widget(MDLabel(text=devices_storage[name]['device_type'], size_hint=(0.5, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
+        # setup ids for info card
+        self.ids['name'] = nam
+        self.ids['dev_type'] = devType
+        self.ids['ip'] = ip_lab
+        self.ids['desc'] = desc
 
+        # create wifi card
+        wifi = MDCard(orientation="horizontal", size_hint=(1, 0.1), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        main_box.add_widget(wifi)
 
-        data = MDLabel(text=f"Hello and welcome to the {name} device controls page.\nIP: {devices_storage[name]['ip']}\nDescription: {devices_storage[name]['desc']}\nDevice Type: {devices_storage[name]['device_type']}", halign="center", size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5})
-
-
-        # create boxlayout
-        box = MDCard(orientation="horizontal")
-        box.size_hint_x = 1
-        box.size_hint_y = 0.2
-
-        # add Label
-        stat= MDLabel(text="Status")
+        # Wifi Box setup
+        stat = MDLabel(text="Status")
         off = MDLabel(text="Offline")
-
         online = onlineButton(name=name, on_press=device_class.is_online, size_hint=(0.1, 0.5),
                               pos_hint={'center_x': 0.5, 'center_y': 0.5})
         online.size_hint_x = 0.1
         online.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
-        box.ids['status'] = off
-        box.add_widget(stat)
-        box.add_widget(off)
-        box.add_widget(online)
-
-        # card for wifi status
-        wifi = MDCard(orientation="horizontal", size_hint=(1, 0.1), pos_hint={'center_x': 0.5, 'center_y': 0.5})
-        main_box.add_widget(wifi)
 
         wifi.ids['status'] = off
         wifi.add_widget(stat)
         wifi.add_widget(off)
         wifi.add_widget(online)
 
-
-        main_box.add_widget(box)
-
         # controls:
         # box
         controls_box = BoxLayout(orientation="horizontal", spacing=10, padding=10, size_hint=(1, 0.5))
-        controls_box.size_hint_x =1
+        controls_box.size_hint_x = 1
         # actual
         forw = MDRectangleFlatButton(text="forward", on_press=lambda x: print("Forward"))
         forw.size_hint_x = 1
@@ -362,7 +390,6 @@ class ScreenIOTControl(Screen):
         # add controls box to main box
         main_box.add_widget(controls_box)
 
-
         # set the size of the main box
         main_box.size_hint = (1, 0.5)
         main_box.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
@@ -373,18 +400,21 @@ class ScreenIOTControl(Screen):
         # add toolbar to root
         self.ids.toolbar_box.add_widget(IOT_toolbar())
 
+        App.get_running_app().root.current = 'ScreenIOTControl'
+
+
 class ValidatingTool:
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def empty_data(self, *args): # check if data is empty
+    def empty_data(self, *args):  # check if data is empty
         for item in args:
             if item == "":
-                return False # return true because empty data
+                return False  # return true because empty data
         # return false if no empty data and close function
         return True
 
-    def checkIP(self, ip): # check if ip is valid
+    def checkIP(self, ip):  # check if ip is valid
         try:
             socket.inet_aton(ip)
             # valid
@@ -393,17 +423,19 @@ class ValidatingTool:
             # invalid
             return False
 
-    def checkDevType(self, dev_type): # check if device type is valid
+    def checkDevType(self, dev_type):  # check if device type is valid
         if dev_type == "Choose Device Type":
             return False
         else:
-            return True # return true if valid
+            return True  # return true if valid
+
 
 """print(ValidatingTool.checkIP('', ip="192.168.0.1"))
 print(ValidatingTool.checkIP('', ip="1.1.1.1"))
 while True:
     pass
 """
+
 
 class ScreenAddDevice(Screen):
     def __init__(self, **kwargs):
@@ -421,28 +453,25 @@ class ScreenAddDevice(Screen):
                     "viewclass": "OneLineListItem",
                     "text": "StrackerTrackerV1",
                     "height": dp(56),
-                    "on_release": lambda x=f"StarTrackerV1": self.callback(x,dropdown),
+                    "on_release": lambda x=f"StarTrackerV1": self.callback(x, dropdown),
                 },
                 {
                     "viewclass": "OneLineListItem",
                     "text": "StrackerTrackerV2",
                     "height": dp(56),
-                    "on_release": lambda x=f"StrackerTrackerV2": self.callback(x,dropdown),
+                    "on_release": lambda x=f"StrackerTrackerV2": self.callback(x, dropdown),
                 },
                 {
                     "viewclass": "OneLineListItem",
                     "text": "StrackerTrackerV3",
                     "height": dp(56),
-                    "on_release": lambda x=f"StrackerTrackerV3": self.callback(x,dropdown),
-                    }
+                    "on_release": lambda x=f"StrackerTrackerV3": self.callback(x, dropdown),
+                }
             ],
             width_mult=4,
         )
         # bind on release to open the dropdown
         dropdown_opener.bind(on_release=lambda a: dropdown.open())
-
-
-
 
     def Validate(self, *args, **kwargs):
         # so much validation :(
@@ -455,13 +484,13 @@ class ScreenAddDevice(Screen):
         # check if ip is valid
         # check if name is already in dict
         if not ValidatingTool.empty_data(self, temp.name.text, temp.ip_id.text, temp.desc.text):
-            self.popup("Please fill in all fields")
+            popup("Please fill in all fields")
         elif not ValidatingTool.checkDevType(self, temp.dropdown_opener.text):
-            self.popup("Please select a device type")
+            popup("Please select a device type")
         elif not ValidatingTool.checkIP(self, temp.ip_id.text):
-            self.popup("Please enter a valid IP")
+            popup("Please enter a valid IP")
         elif temp.name.text in devices_storage:
-            self.popup("Name already in use")
+            popup("Name already in use")
         else:
             # add to dict
             devices_storage.put(temp.name.text, desc=temp.desc.text, ip=temp.ip_id.text,
@@ -469,15 +498,7 @@ class ScreenAddDevice(Screen):
             App.get_running_app().root.current = "ScreenHome"
             App.get_running_app().root.ids.screen_Home_id.setup()
 
-
-    def popup(self, error, *args):
-        box = BoxLayout(orientation="vertical")
-        popup = Popup(title='Error', content=box, size_hint={0.4, 0.2})
-        box.add_widget(Label(text=error))
-        box.add_widget(Button(text="Close", on_press=popup.dismiss))
-        popup.open()
-
-    def callback(self, text_item,dropdown):
+    def callback(self, text_item, dropdown):
         logging.debug(text_item)
         drop = App.get_running_app().root.ids.screen_Add_id.ids.dropdown_opener
         drop.text = text_item
@@ -488,6 +509,12 @@ class ScreenAddDevice(Screen):
         pass
 
 
+def popup(error, *args):
+    box = BoxLayout(orientation="vertical")
+    popup = Popup(title='Error', content=box, size_hint={0.4, 0.2})
+    box.add_widget(Label(text=error))
+    box.add_widget(Button(text="Close", on_press=popup.dismiss))
+    popup.open()
 
 
 class OpenerButton(MDIconButton):
@@ -601,7 +628,6 @@ class ScreenMain(Screen):
 class DeviceCard(MDCard):
     text = StringProperty
 
-
     def __init__(self, name, dev_type, **kwargs):
         super().__init__(**kwargs)
         self.name = name
@@ -695,7 +721,7 @@ class MeButton(MDIconButton):
 
 
 class LunaApp(MDApp):
-    def __init__(self, nursery,**kwargs):
+    def __init__(self, nursery, **kwargs):
         super().__init__(**kwargs)
         self.nursery = nursery
         self.title = "Luna"
@@ -704,6 +730,7 @@ class LunaApp(MDApp):
         self.theme_cls.accent_palette = "Purple"
         self.theme_cls.primary_hue = "A700"
         self.theme_cls.accent_hue = "A700"
+
     def build(self):
         """This method returns the Manager class"""
         self.theme_cls.theme_style = "Dark"
@@ -713,15 +740,13 @@ class LunaApp(MDApp):
         # change buttons to red
         App.get_running_app().theme_cls.primary_palette = "Purple"
 
-          # check if devices already present if so, skip add device screen!
+        # check if devices already present if so, skip add device screen!
         self.root = Manager()
         return self.root
 
     def on_start(self):
         # hopefully this fixes error!
         self.checkComplete()
-
-
 
     def checkComplete(self):
         devices_storage = JsonStore('devices.json')
@@ -750,12 +775,13 @@ class LunaApp(MDApp):
         # change buttons to red
         App.get_running_app().theme_cls.primary_palette = "Purple"
 
+
 class ScreenCredits(Screen):
     def on_enter(self, *args):
         logging.debug("ENTERED CREDITS SCREEN")
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     # Start kivy app as an asynchronous task
     async def main() -> None:
         async with trio.open_nursery() as nursery:
