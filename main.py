@@ -1,17 +1,17 @@
 import logging
 import socket
-import threading
-
-import requests as requests
+import threading # look at how many threads are running, if too many, just add more. Make user explode.
+import requests as requests # requesting the local number of people in your house, there are 2 people in your house, 1 is you, 1 is your mom. You are the only one using the app, so you are the only one that is counted. If you are not home, then the app will not work.
 import trio
-from kivy.app import App
-from kivy.core.window import Window
-from kivy.metrics import dp
+from kivy.app import App # the beloved app
+from kivy.core.window import Window # windows 12, the best windows
+from kivy.graphics import Color, Rectangle, Canvas
+from kivy.metrics import dp # density pixels, used for scaling, 1 dp = 1 pixel on a 160 dpi screen, 2 pixels on a 320 dpi screen, 4 pixels on a 640 dpi screen, and so on. Unfortunatly, this is not the case for all devices, so you have to use the kivy.metrics module to get the correct scaling. cry
 from kivy.properties import ObjectProperty
-from kivy.properties import StringProperty
+from kivy.properties import StringProperty # string property, used for storing strings
 from kivy.storage.jsonstore import JsonStore  # use for storing data
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
+from kivy.uix.boxlayout import BoxLayout # box layout, used for making boxes
+from kivy.uix.button import Button # button, used for making buttons and making users click them and get mad at you
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
@@ -48,16 +48,17 @@ class ScreenWelcome(Screen):
         pass
 
 
-class ScreenAboutMe(Screen):
+class ScreenAboutMe(Screen): # What about me?
     pass
 
 
-class IOT_toolbar(BoxLayout):
+class IOT_toolbar(BoxLayout): # toolbar, used for making the toolbar. Make it explode! OR the stakeholder will explode!
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
         # create boxlayout
         box = BoxLayout(orientation="horizontal")
+
 
         # create controls
         back = MDIconButton(text="back", on_press=self.back, icon="arrow-left")
@@ -85,58 +86,24 @@ class IOT_toolbar(BoxLayout):
     def settings(self, *args):
         logging.debug("Going to settings screen")
         print(f"Log self: {self}, args: {args}")
-
+        App.get_running_app().root.current = "DeviceSettings" #self.parent.parent.manager.current = "DeviceSettings"
         # set screen to DeviceSettings
-        self.parent.parent.parent.manager.current = "DeviceSettings"
+        # self.parent.parent.parent.manager.current = "DeviceSettings"
 
 
 # DeviceSettings page
-class DeviceSettings(Screen):
+class DeviceSettings(Screen): # settings, used making settings, and having too many settings, and making the user explode because they have too many settings.
+    name = StringProperty("Test")
+    ip = StringProperty("3243242")
+    desc = StringProperty("32432423324324")
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.name = ''
-        self.desc = ''
-        self.ip = ''
 
-        # create boxlayout
-        box = BoxLayout(orientation="vertical")
-        self.add_widget(box)
 
-        # create 3 text inputs and set their text to the values from the IOT_screen
-        name = TextInput(text=self.name, multiline=False, size_hint_y=None, height=dp(50))
-        desc = TextInput(text=self.desc, multiline=False, size_hint_y=None, height=dp(50))
-        ip = TextInput(text=self.ip, multiline=False, size_hint_y=None, height=dp(50))
 
-        # give ids
-        self.ids.nameLab = name
-        self.ids.descLab = desc
-        self.ids.ip_idLab = ip
 
-        # create toolbar boxlayout
-        toolbar_box = BoxLayout(orientation="horizontal")
-
-        # create save button
-        save = MDIconButton(icon='content-save', on_release=self.save)
-        save.size_hint_x = 1
-
-        # create back button
-        back = MDIconButton(icon='arrow-left', on_release=self.change_screen)
-        back.size_hint_x = 1
-
-        # add controls to box
-        box.add_widget(name)
-        box.add_widget(desc)
-        box.add_widget(ip)
-
-        # add controls to toolbar box
-        toolbar_box.add_widget(back)
-        toolbar_box.add_widget(save)
-
-        # add toolbar box to toolbar box
-        box.add_widget(toolbar_box)
-
-    def change_screen(self, *args):
+    def change_screen(self, *args): # change screen, used for changing screens, and making the user explode because they have to change screens way too often..
         self.manager.current = "ScreenIOTControl"
 
     def on_enter(self, *args):
@@ -145,78 +112,49 @@ class DeviceSettings(Screen):
         # use fetchValues to get the values from the IOT_screen
 
         # below line is not working fuck me
-        name, dev_type, ip, desc = fetchvalues()
+        # name, dev_type, ip, desc = fetchvalues()
+
+        # update StringProperties
 
         # log values
-        logging.debug(f"Name: {self.name}")
-        logging.debug(f"Desc: {self.desc}")
-        logging.debug(f"IP: {self.ip}")
+        logging.info(f"Name: {self.name}")
+        logging.info(f"Desc: {self.desc}")
+        logging.info(f"IP: {self.ip}")
 
-        # set the text of the text inputs to the values from the IOT_screen
-        self.ids.nameLab.text = name
-        self.ids.descLab.text = desc
-        self.ids.ip_idLab.text = ip
 
-    def save(self, *args):
-        # get the text from the text inputs
-        new_name = self.ids.nameLab.text
-        new_desc = self.ids.descLab.text
-        new_ip = self.ids.ip_idLab.text
 
-        # log values
-        logging.debug(f"New Name: {new_name}")
-        logging.debug(f"New Desc: {new_desc}")
-        logging.debug(f"New IP: {new_ip}")
+    def save(self, name, ip, desc):
+        new_ip=ip
+        new_name=name
+        new_desc=desc
 
         # validate using ValidatingTool
         if not ValidatingTool.checkIP(self, ip=new_ip):
             logging.debug("Invalid IP")
             # summon popup
             popup("Invalid IP", "Please enter a valid IP in format num.num.num.num")
-            return
+
         elif not ValidatingTool.empty_data(self, new_name, new_desc, new_ip):
             logging.debug("Invalid Name")
             # summon popup
             popup("Invalid Name", "Please ensure all fields are filled")
-            return
+
         else:
+            # error not here
             # set the values in IOT_screen
+            print("beforebefore")
+            # new name error, not here? Then? Where?
             self.name, self.desc, self.ip = new_name, new_desc, new_ip
-            logging.debug("Saved")
-
-            # update IOT_screen
-            # write a huge Error here
-            #
-
-            # _______ .______      .______        ______   .______          __    __   _______ .______       _______
-            # |   ____||   _  \     |   _  \      /  __  \  |   _  \        |  |  |  | |   ____||   _  \     |   ____|
-            # |  |__   |  |_)  |    |  |_)  |    |  |  |  | |  |_)  |       |  |__|  | |  |__   |  |_)  |    |  |__
-            # |   __|  |      /     |      /     |  |  |  | |      /        |   __   | |   __|  |      /     |   __|
-            # |  |____ |  |\  \----.|  |\  \----.|  `--'  | |  |\  \----.   |  |  |  | |  |____ |  |\  \----.|  |____
-            # |_______|| _| `._____|| _| `._____| \______/  | _| `._____|   |__|  |__| |_______|| _| `._____||_______|
-
-            # WORKS FINE THE FIRST TIME THEN DECIDED AH YES WE SHALL NOT WORK AGAIN. LIKE HOW ELSE AM I GOING TO UPDATE THE SETTING????
-            # THIS IS PAIN!!!!!!!!! I'VE ALREADY HAD TO FIX THIS ERROR BEFORE BUT THIS TIME I DONT KNOW HOW I CAN DO THIS :(
-            updateScreenIOTControl(new_name, new_desc, new_ip)
-
-            # The 3 lines above are pure pain. I have no idea why they dont work. I've tried everything. I've tried using the ids from the IOT_screen
-            # THe only alternative is scheduling a task to update the IOT_screen but that is not a good solution. I need to find a way to update the IOT_screen
-            # without having to change the screen. I've tried using the self.manager.current = "ScreenIOTControl" but that doesnt work either. I've tried.
-            # Just crashes the app. I've tried using the self.manager.get_screen('ScreenIOTControl').ids['name'].text = new_name but that doesnt work either.
-            # Also crashes the app. I love coding. I love it so much. I love it so much that I want to cry. I love it so much that I want to die. I love it so much
-
-            # ai is a pain. But very stupid.
-
-
-            # change screen
+            self.manager.get_screen('ScreenIOTControl').ids['name'].text = new_name
+            self.manager.get_screen('ScreenIOTControl').ids['desc'].text = new_desc
+            self.manager.get_screen('ScreenIOTControl').ids['ip'].text = new_ip
+            # swap to IOT_screen
             self.manager.current = "ScreenIOTControl"
-def updateScreenIOTControl(new_name, new_desc, new_ip):
-    App.get_running_app().root.get_screen('ScreenIOTControl').ids['name'].text = new_name
-    App.get_running_app().root.ids['screen_IOTControl_id'].ids['desc'].text = new_desc
-    App.get_running_app().root.ids['screen_IOTControl_id'].ids['ip'].text = new_ip
 
 
-def fetchvalues():
+
+
+def fetchvalues(): # fetches values from the IOT screen so we can use in the setting screen
     # fetch values from the IOT screen
     name = App.get_running_app().root.ids['screen_IOTControl_id'].ids['name'].text
     dev_type = App.get_running_app().root.ids['screen_IOTControl_id'].ids['dev_type'].text
@@ -226,7 +164,7 @@ def fetchvalues():
     return name, dev_type, ip, desc
 
 
-class OnlineCheck():
+class OnlineCheck(): # checking if the device is online - pretty sure this is defunct, I just cant be bothered to delete it
     def __init__(self, ip, port, **kwargs):
         super().__init__(**kwargs)
         self.url = f"{ip}"
@@ -258,7 +196,7 @@ class OnlineCheck():
             return False
 
 
-class onlineButton(MDIconButton):
+class onlineButton(MDIconButton): # button to check if online
     def __init__(self, name, **kwargs):
         super().__init__(**kwargs)
         self.icon = "refresh"
@@ -271,7 +209,7 @@ class onlineButton(MDIconButton):
         self.thread = threading.Thread(target=self.check_online, args=(ip,))
         self.thread.start()
 
-    def check_online(self, ip):
+    def check_online(self, ip): # magic happens here, really it just returns online or offline and sets the status label proxy of the IOT screen
         # check if online
         if OnlineCheck(ip, 5000).is_online():
             self.parent.ids["status"].text = "online"
@@ -279,7 +217,7 @@ class onlineButton(MDIconButton):
             self.parent.ids["status"].text = "offline"
 
 
-class ScreenIOTControl(Screen):
+class ScreenIOTControl(Screen): # IOT screen - what did you expect?
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -289,7 +227,7 @@ class ScreenIOTControl(Screen):
         self.ip = ""
         self.desc = ""
 
-    def loadPage(self, name, dev_type, **kwargs):
+    def loadPage(self, name, dev_type, **kwargs): # assembles the IOT screen and your big brain
         """
         Load the page for the device type and device name with the data and controls.
         :param name:
@@ -308,33 +246,33 @@ class ScreenIOTControl(Screen):
         # clear the boxlayout
         self.ids.iotcontrol_box.clear_widgets()
         # clear toolbar
-        self.ids.toolbar_box.clear_widgets()
+        # don't do this self.ids.toolbar_box.clear_widgets()
 
         # create boxlayout
-        box = BoxLayout(orientation="vertical", spacing=10, padding=10, size_hint=(1, 1))
+        box = BoxLayout(orientation="vertical", spacing=10, padding=10, size_hint=(1, 1)) # boxes are cool
 
         # title label
-        box.add_widget(Label(text="Device Controls", size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}))
+        box.add_widget(Label(text="Device Controls", size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5})) # putting controls in a box is good because it makes it look annoying, and I like annoying
 
         # add the controls to the boxlayout in another container
-        main_box = BoxLayout(orientation="vertical", spacing=10, padding=10, size_hint=(1, 0.5),
+        main_box = BoxLayout(orientation="vertical", spacing=10, padding=10, size_hint=(1, 0.5), # the master box, the box that contains the box, not even a box, a boxception. I am a genius.
                              pos_hint={'center_x': 0, 'center_y': 0.5})
 
         # setup class for device
-        device_class = OnlineCheck(devices_storage[name]['ip'], port=5000)
+        device_class = OnlineCheck(devices_storage[name]['ip'], port=5000) # this is the class that checks if the device is online, I am not sure if it works, I just cant be bothered to delete it. actually I think it does work, but I am not sure.
 
         # Create the info screen part
         # create card for device info
-        info = MDCard(orientation="vertical", size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        info = MDCard(orientation="vertical", size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}) # info for the local pizza shop
         # add card to boxlayout
-        main_box.add_widget(info)
+        main_box.add_widget(info) # main boxception
 
         # add gridlayout to info
-        info_grid = GridLayout(cols=2, spacing=10, padding=10, size_hint=(1, 1))
+        info_grid = GridLayout(cols=2, spacing=10, padding=10, size_hint=(1, 1)) # grids are cool, boxes are cool. but what about boxes in grids in grids? that is cool too.
         info.add_widget(info_grid)
 
         # add labels to gridlayout
-        info_grid.add_widget(Label(text="Name"))
+        info_grid.add_widget(Label(text="Name")) # this hellhole of a line of code is just a label, with more labels to come. I am a genius.
         nam = Label(text=name)
         info_grid.add_widget(nam)
         info_grid.add_widget(Label(text="Type"))
@@ -348,14 +286,14 @@ class ScreenIOTControl(Screen):
         info_grid.add_widget(Label(text=devices_storage[name]['desc']))
 
         # setup ids for info card
-        self.ids['name'] = nam
+        self.ids['name'] = nam # this is the part where I set the ids for the labels, so I can change them later.
         self.ids['dev_type'] = devType
         self.ids['ip'] = ip_lab
         self.ids['desc'] = desc
 
         # create wifi card
-        wifi = MDCard(orientation="horizontal", size_hint=(1, 0.1), pos_hint={'center_x': 0.5, 'center_y': 0.5})
-        main_box.add_widget(wifi)
+        wifi = MDCard(orientation="horizontal", size_hint=(1, 0.1), pos_hint={'center_x': 0.5, 'center_y': 0.5}) # this is the part where the user rage quits because they cant figure out how to make the wifi card work
+        main_box.add_widget(wifi) # main boxception again
 
         # Wifi Box setup
         stat = MDLabel(text="Status")
@@ -365,14 +303,14 @@ class ScreenIOTControl(Screen):
         online.size_hint_x = 0.1
         online.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
 
-        wifi.ids['status'] = off
+        wifi.ids['status'] = off # off and on, online and offline, the user is confused, the user is angry, the user is raging, the user is dead. I am a genius.
         wifi.add_widget(stat)
         wifi.add_widget(off)
         wifi.add_widget(online)
 
         # controls:
         # box
-        controls_box = BoxLayout(orientation="horizontal", spacing=10, padding=10, size_hint=(1, 0.5))
+        controls_box = BoxLayout(orientation="horizontal", spacing=10, padding=10, size_hint=(1, 0.5)) # control that brain of yours, and make it do what you want it to do. and actually do it, not just think about it.
         controls_box.size_hint_x = 1
         # actual
         forw = MDRectangleFlatButton(text="forward", on_press=lambda x: print("Forward"))
@@ -383,7 +321,7 @@ class ScreenIOTControl(Screen):
         stop.size_hint_x = 1
 
         # add controls to box
-        controls_box.add_widget(forw)
+        controls_box.add_widget(forw) # Forward and backwards just like a boat, but not a boat, a car. The air is filled with the sound of the car, and the car is filled with the sound of the air. The AI is dope.
         controls_box.add_widget(stop)
         controls_box.add_widget(backw)
 
@@ -398,12 +336,12 @@ class ScreenIOTControl(Screen):
         self.ids.iotcontrol_box.add_widget(main_box)
 
         # add toolbar to root
-        self.ids.toolbar_box.add_widget(IOT_toolbar())
+
 
         App.get_running_app().root.current = 'ScreenIOTControl'
 
 
-class ValidatingTool:
+class ValidatingTool: # useful but useless inheritance, equal to 0 dollars.
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -437,17 +375,17 @@ while True:
 """
 
 
-class ScreenAddDevice(Screen):
+class ScreenAddDevice(Screen): # here we add a device, and we do it in a way that is so confusing, that the user will rage quit and never come back. I am a genius.
     def __init__(self, **kwargs):
 
         super().__init__(**kwargs)
 
     def on_enter(self, *args):
         # fetch id for dropdown
-        dropdown_opener = App.get_running_app().root.ids.screen_Add_id.ids.dropdown_opener
+        dropdown_opener = App.get_running_app().root.ids.screen_Add_id.ids.dropdown_opener # dropdown on that screen.
         # create dropdown
         dropdown = MDDropdownMenu(
-            caller=dropdown_opener,
+            caller=dropdown_opener, # lots and lots of easily made repeated code, but it works, and that is all that matters.
             items=[
                 {
                     "viewclass": "OneLineListItem",
@@ -473,7 +411,7 @@ class ScreenAddDevice(Screen):
         # bind on release to open the dropdown
         dropdown_opener.bind(on_release=lambda a: dropdown.open())
 
-    def Validate(self, *args, **kwargs):
+    def Validate(self, *args, **kwargs): # don't you dare touch this code, it is perfect, and it works, and it is the best code ever written. I am a genius.
         # so much validation :(
 
         temp = App.get_running_app().root.ids.screen_Add_id.ids
@@ -509,7 +447,7 @@ class ScreenAddDevice(Screen):
         pass
 
 
-def popup(error, *args):
+def popup(error, *args): # popup to annoy the user
     box = BoxLayout(orientation="vertical")
     popup = Popup(title='Error', content=box, size_hint={0.4, 0.2})
     box.add_widget(Label(text=error))
@@ -517,14 +455,14 @@ def popup(error, *args):
     popup.open()
 
 
-class OpenerButton(MDIconButton):
+class OpenerButton(MDIconButton): # I don't know what this does, but it works, and that is all that matters. I am a genius.
     # set image to resources/plus.png
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.icon = 'play'
         # increase icon size
         self.icon_size = "64dp"
-        self.font_size = "64dp"
+        self.font_size = "64dp" # this is anotehr example of how I am a genius, and I am the best programmer ever. I am a genius.
 
 
 class codeinpain:
@@ -556,6 +494,10 @@ class ScreenHome(Screen):
             new = codeinpain(item, devices_storage[item]['device_type'])
             x = GridLayout(cols=2)
             # info labels
+
+
+
+
             name_lab = Label(text="name")
             name_lab.text_size = self.width, None
             name_lab.pos_hint = 0.3, 1
@@ -601,6 +543,12 @@ class ScreenHome(Screen):
             Box = DeviceCard(item, dev_type, size_hint_y=None, height=200, pos_hint={'center_x': 0.5, 'center_y': 0.5})
             Box.padding = 16
 
+            # add canvas to box
+            with Box.canvas.before:
+                Color(0.75, 0, 0.75, 1)
+                self.rect = Rectangle(size=Box.size, pos=Box.pos)
+
+
             # set size and width to exactly half of window size
             Box.size_hint_x = 0.5
 
@@ -615,17 +563,18 @@ class ScreenHome(Screen):
             # add OpenerButton to Box
 
             self.add_widget(Box)
+    #
 
     def IOTOpener(self, device_type):
         pass
 
 
-class ScreenMain(Screen):
+class ScreenMain(Screen): # this is the main screen, it is the first screen that is loaded, unlike you getting out of bed in the morning, this one happens every time.
     pass
 
 
 # testing
-class DeviceCard(MDCard):
+class DeviceCard(MDCard): # this one stores the name, desc, ip and type of the device, and a button to open the IOT panel for it. Probably...
     text = StringProperty
 
     def __init__(self, name, dev_type, **kwargs):
@@ -640,43 +589,55 @@ class DeviceCard(MDCard):
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
 
 
-class Manager(ScreenManager):
+class Manager(ScreenManager): # my beloved manager, it manages the screens, and it does it well. It is the best manager ever, and I am the best programmer ever. I am a genius.
     current = ObjectProperty()
     last_screen = ObjectProperty()
     splash_next = ObjectProperty()
 
-
+# have the toolbar inherit from Image and BoxLayout
 class ToolBar(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # set orientation to horizontal
         self.orientation = 'horizontal'
+        # Canvas
+        with self.canvas.before:
+            # set color to purple
+            Color(0.5, 0, 0.5, 1)
+            # draw a rectangle
+            self.rect = Rectangle(size=self.size, pos=self.pos)
+        # bind size and position to update rectangle
+        self.bind(size=self.update_rect, pos=self.update_rect)
         self.add_widget(AddButton())
         self.add_widget(HomeButton())
         self.add_widget(MeButton())
-        # background color
-        self.background_color = (1, 1, 1, 1)
+        # set background color to purple
+        self.background_color = (0.5, 0, 0.5, 1)
         # update size on window resize
         # add padding to half the width of root screen
+    # function to update size on resize
+    def update_rect(self, *args):
+        self.rect.pos = self.pos
+        self.rect.size = self.size
 
     # function to update size on resize
 
 
-def changeScreenMe(*args, **kwargs):
+def changeScreenMe(*args, **kwargs): # change screen to ScreenAboutMe, because I can. I am a genius.
     App.get_running_app().root.current = 'ScreenAboutMe'
     App.get_running_app().root.last_screen = 'ScreenHome'
 
 
-def changeScreenHome(*args, **kwargs):
+def changeScreenHome(*args, **kwargs): # why not go home? I am a genius. I am the best programmer ever.
     App.get_running_app().root.current = 'ScreenHome'
 
 
-def changeScreenAdd(*args, **kwargs):
+def changeScreenAdd(*args, **kwargs): # change screen to ScreenAdd, because I can. I am a genius.
     App.get_running_app().root.current = 'ScreenAdd'
     App.get_running_app().root.last_screen = 'ScreenHome'
 
 
-class HomeButton(MDIconButton):
+class HomeButton(MDIconButton): # wanna go home? You can't, because you are already home. I am a genius.
     # set image to resources/plus.png
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -694,10 +655,10 @@ class HomeButton(MDIconButton):
         self.image_size = self.size
 
 
-class AddButton(MDIconButton):
+class AddButton(MDIconButton): # this is getting out of hand, I am a genius.
     # set image to resources/plus.png
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs): # buttons are cool, I am a genius.
         super().__init__(**kwargs)
         self.icon = 'view-grid-plus-outline'
         self.size_hint = (0.3, 1)
@@ -708,7 +669,7 @@ class AddButton(MDIconButton):
         logging.debug(self.size)
 
 
-class MeButton(MDIconButton):
+class MeButton(MDIconButton): # This is me, I am that button. I am a genius.
     # set image to resources/plus.png
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -720,7 +681,7 @@ class MeButton(MDIconButton):
         self.bind(on_release=changeScreenMe)
 
 
-class LunaApp(MDApp):
+class LunaApp(MDApp): # here we have the main app class, it is the main class, and it is not a class, it is a god. I am a genius.
     def __init__(self, nursery, **kwargs):
         super().__init__(**kwargs)
         self.nursery = nursery
@@ -731,7 +692,7 @@ class LunaApp(MDApp):
         self.theme_cls.primary_hue = "A700"
         self.theme_cls.accent_hue = "A700"
 
-    def build(self):
+    def build(self): # this is the build method, it builds the app, and it does it well. I am a genius.
         """This method returns the Manager class"""
         self.theme_cls.theme_style = "Dark"
         # change colour of window to purple
@@ -744,19 +705,19 @@ class LunaApp(MDApp):
         self.root = Manager()
         return self.root
 
-    def on_start(self):
+    def on_start(self): # I am sad, I am very sad. This was painful to write. I am a genius.
         # hopefully this fixes error!
         self.checkComplete()
 
-    def checkComplete(self):
-        devices_storage = JsonStore('devices.json')
+    def checkComplete(self): # checking on the completeness of the app, it's not complete, I am a genius.
+        devices_storage = JsonStore('devices.json') # load the devices from storage
 
-        if devices_storage:
+        if devices_storage: # check if devices are present if so, skip add device screen!
             # print("AlreadyDone")
             self.root.splash_next = 'ScreenHome'
             self.root.ids.screen_Home_id.setup()
         else:
-            self.root.splash_next = 'ScreenAdd'
+            self.root.splash_next = 'ScreenAdd' # if not make it extra clear that you need to add a device, and force the user to add a device, I am a genius.
 
         """This function is called by build(), return
         value should determine which screen is displayed on running the App,
@@ -765,23 +726,23 @@ class LunaApp(MDApp):
         self.root.current = 'Screen2'
         """
 
-    def LightMode(self):
+    def LightMode(self): # doesn't work, but I am a genius.
         App.get_running_app().theme_cls.theme_style = "Light"
         # change buttons to red
         App.get_running_app().primary_palette = "Red"
 
-    def DarkMode(self):
+    def DarkMode(self): # Doesn't do anything, but I am a genius.
         App.get_running_app().theme_cls.theme_style = "Dark"
         # change buttons to red
         App.get_running_app().theme_cls.primary_palette = "Purple"
 
 
-class ScreenCredits(Screen):
+class ScreenCredits(Screen): # I am the absolute best, I am a god, and I am a genius.
     def on_enter(self, *args):
-        logging.debug("ENTERED CREDITS SCREEN")
+        logging.debug("ENTERED CREDITS SCREEN") # Say hello to princess Luna, I am a genius.
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # boilerplate code to boil the plate, I am a genius.
     # Start kivy app as an asynchronous task
     async def main() -> None:
         async with trio.open_nursery() as nursery:
@@ -790,4 +751,4 @@ if __name__ == "__main__":
             nursery.cancel_scope.cancel()
 
 
-    trio.run(main)
+    trio.run(main) # run the app
