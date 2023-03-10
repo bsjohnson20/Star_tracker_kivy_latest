@@ -1,4 +1,5 @@
 import logging
+import os
 import socket
 import threading  # look at how many threads are running, if too many, just add more. Make user explode.
 import \
@@ -19,6 +20,7 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.textinput import TextInput
+from kivy.uix.widget import Widget
 from kivymd.app import MDApp
 from kivymd.uix.button import MDIconButton, MDRectangleFlatButton
 from kivymd.uix.card import MDCard, MDCardSwipe
@@ -171,25 +173,16 @@ class OnlineCheck():  # checking if the device is online - pretty sure this is d
 
     # check if online
     def is_online(self):
-        try:
-            # create socket
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            # set timeout
-            s.settimeout(5)
-            # connect to socket
-            s.connect((self.url, self.port))
-            # close socket
-            s.close()
-
-            # if online return true
+        # use ping in os module
+        response = os.system("ping -n 1 " + self.url)
+        # and then check the response...
+        if response == 0:
+            self.status = "online"
             return True
-        except (requests.ConnectionError, requests.Timeout):
-            # if not online return false
-            print("not online")
+        else:
+            self.status = "offline"
             return False
-        except (ConnectionAbortedError, ConnectionRefusedError):
-            print("not online")
-            return False
+
 
 
 class onlineButton(MDIconButton):  # button to check if online
@@ -263,7 +256,8 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
 
         # Create the info screen part
         # create card for device info
-        info = MDCard(orientation="vertical", size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5}) # info for the local pizza shop
+        info = MDCard(orientation="vertical", size_hint=(1, 0.5),
+                      pos_hint={'center_x': 0.5, 'center_y': 0.5})  # info for the local pizza shop
         # add card to boxlayout
         main_box.add_widget(info)  # main boxception
 
@@ -471,7 +465,7 @@ class OpenerButton(
         self.icon = 'play'
         # increase icon size
         self.icon_size = "64dp"
-        self.font_size = "64dp" # this is anotehr example of how I am a genius, and I am the best programmer ever. I am a genius.
+        self.font_size = "64dp"  # this is anotehr example of how I am a genius, and I am the best programmer ever. I am a genius.
 
 
 class codeinpain:
@@ -479,6 +473,18 @@ class codeinpain:
         self.item = item
         self.type = devType
 
+
+class Deletethis(MDIconButton):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.icon = 'delete'
+        self.icon_size = "64dp"
+        self.font_size = "64dp"
+
+    def removeFromDatabase(self, name):
+        # fetch name to delete
+        # delete from database
+        devices_storage.delete(name)
 
 class ScreenHome(Screen):
     def __init__(self, **kwargs):
@@ -502,71 +508,27 @@ class ScreenHome(Screen):
         for item in devices_storage:
             print(item)
             new = codeinpain(item, devices_storage[item]['device_type'])
-            x = GridLayout(cols=2)
-            # info labels
-
-            name_lab = Label(text="name")
-            name_lab.text_size = self.width, None
-            name_lab.pos_hint = 0.3, 1
-            desc_lab = Label(text="desc")
-            desc_lab.text_size = self.width, None
-            desc_lab.pos_hint = 0.3, 1
-            ip_lab = Label(text="ip")
-            ip_lab.text_size = self.width, None
-            ip_lab.pos_hint = 0.3, 1
-            type_lab = Label(text="type")
-            type_lab.text_size = self.width, None
-            type_lab.pos_hint = 0.3, 1
-
-            # data labels
-            dev_type = Label(text=devices_storage[item]['device_type'])
-            dev_type.pos_hint = 0.3, 1
-            desc_label = Label(text=devices_storage[item]['desc'])
-            desc_label.pos_hint = 0.3, 1
-            name_label = Label(text=item)
-            name_label.pos_hint = 0.3, 1
-            ip_label = Label(text=devices_storage[item]['ip'])
-            ip_label.pos_hint = 0.3, 1
-
-            # add labels
-            x.add_widget(name_lab)
-            x.add_widget(name_label)
-
-            x.add_widget(desc_lab)
-            x.add_widget(desc_label)
-
-            x.add_widget(ip_lab)
-            x.add_widget(ip_label)
-
-            x.add_widget(type_lab)
-            x.add_widget(dev_type)
-
-            logging.debug("I am", self)
-
-            # x
             self.parent.item = item
 
             # create THE Box this'll contain labels and the buton to open the corresponding IOT panel
-            Box = DeviceCard(item, dev_type, size_hint_y=None, height=200, pos_hint={'center_x': 0.5, 'center_y': 0.5})
+            Box = DeviceCard(name=item, ip=devices_storage[item]['ip'], desc=devices_storage[item]['desc'], device=devices_storage[item]['device_type'], size_hint_y=None, height=200, pos_hint={'center_x': 0.5, 'center_y': 0.5})
             # add color to Box
             # make it pretty
+            # it didn't work :(, I wish It did. Then I could be a genius.
             Box.color = (0.5, 0, 0.5, 1)
             Box.padding = 16
+            # loop through attributes of box
+
+            # add Box to screen
+            self.add_widget(Box)
 
             # set size and width to exactly half of window size
-            Box.size_hint_x = 0.5
-
-            Box.add_widget(x)
-            self.ids['luna'] = name_label
-            # debug button
-
+            Box.size_hint_x = 1
+            print(Box.ids)
             # clickable image
             logging.debug("BINDING TO " + self.parent.item + " " + devices_storage[item]['device_type'])
-            logging.debug(name_label.text)
 
-            # add OpenerButton to Box
 
-            self.add_widget(Box)
 
     # update rectangle position and size
     def _update_rect(self, instance, value, *args):
@@ -583,12 +545,18 @@ class ScreenMain(
 
 # testing
 class DeviceCard(MDCardSwipe): # this one stores the name, desc, ip and type of the device, and a button to open the IOT panel for it. Probably...
-    text = StringProperty
+    name = StringProperty()
+    device = StringProperty()
+    ip = StringProperty()
+    desc = StringProperty()
 
-    def __init__(self, name, dev_type, **kwargs):
+
+    def __init__(self, name, ip, desc, device, **kwargs):
         super().__init__(**kwargs)
         self.name = name
-        self.dev_type = dev_type
+        self.device = device
+        self.ip = ip
+        self.desc = desc
         self.on_release = lambda: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(name,
                                                                                                devices_storage[name][
                                                                                                    'device_type'])

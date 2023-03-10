@@ -53,6 +53,7 @@
 
 
 
+
 <ScreenWelcome>:
     BoxLayout:
         orientation: 'vertical'
@@ -172,10 +173,10 @@
                 halign:"center"
             # Cards go here - build a generator for them...
             ScrollView:
-
+                scroll_distance: 100
                 size_hint_x: 1
 
-                StackLayout:
+                MDList:
                     size_hint_y:None
                     height: self.minimum_height
                     spacing: 10
@@ -184,6 +185,26 @@
                 size_hint_y: 0.1
 
 
+<DeviceCard>:
+
+    size_hint_y: None
+    size_hint_x: 1
+    MDCardSwipeLayerBox:
+        # delete me
+        Deletethis:
+            on_release:
+                self.removeFromDatabase(root.name)
+                root.parent.remove_widget(root)
+                # update the database
+
+
+
+    MDCardSwipeFrontBox:
+
+        OneLineListItem:
+            id: card_name
+        # show name of root.name
+            text: root.name
 
 
 
