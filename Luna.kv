@@ -205,19 +205,27 @@
         OneLineListItem:
             size_hint_y: 1
             id: card_name
+            on_release:
+                print("card name pressed")
+                root.open()
         # show name of root.name
             BoxLayout:
                 orientation: "horizontal"
                 # center
-                MDIcon:
 
-                    icon: "lightbulb-on"
-                    halign: "center"
-                    size_hint_x: 0.1
                 MDLabel:
                     text: root.name+"\n"+root.desc+"\n"+root.ip
                     halign: "center"
-                    size_hint_x: 0.9
+                    size_hint_x: 1
+                MDIcon:
+                    pos_hint: {"center_x": .5, "center_y": .5}
+                    icon: "lightbulb-on"
+                    halign: "center"
+                    size_hint_x: 0.1
+                    # set size to change with the screen
+                    size: self.texture_size
+                    # set the size of the icon to be the same as the text
+                    icon_size: root.size
 
 
 
@@ -252,6 +260,12 @@
                     size: self.size
             # scale toolbar to 10% of screen height
             IOT_toolbar:
+                # set name, desc and ip
+                name: root.name
+                desc: root.desc
+                ip: root.ip
+
+
 
 
             # scale x to 100% of screen width
@@ -288,15 +302,16 @@
 
 <DeviceSettings>:
     on_enter:
-        # update self variables by copying the values from ScreenIOTControl
-        self.name = self.parent.ids.screen_IOTControl_id.ids.name.text
-        self.desc = self.parent.ids.screen_IOTControl_id.ids.desc.text
-        self.ip = self.parent.ids.screen_IOTControl_id.ids.ip.text
+        print(root.manager.name)
+        self.name = root.manager.name
+        self.desc = root.manager.desc
+        self.ip = root.manager.ip
 
         # update the text inputs
-        self.ids.nameInput.text = self.name
-        self.ids.descInput.text = self.desc
-        self.ids.ipInput.text = self.ip
+        self.ids.nameInput.text = root.manager.name
+        self.ids.descInput.text = root.manager.desc
+        self.ids.ipInput.text = root.manager.ip
+
     BoxLayout:
         orientation: 'vertical'
         BoxLayout:
@@ -342,6 +357,7 @@
                 size_hint_x: 1
                 text: "Back"
                 on_release:
+
                     root.manager.current = "ScreenIOTControl"
                     root.manager.last_screen = "DeviceSettings"
                 icon: "arrow-left"

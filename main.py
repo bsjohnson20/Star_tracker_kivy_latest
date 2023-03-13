@@ -58,6 +58,9 @@ class ScreenAboutMe(Screen):  # What about me?
 
 
 class IOT_toolbar(BoxLayout):  # toolbar, used for making the toolbar. Make it explode! OR the stakeholder will explode!
+    name = StringProperty("Test")
+    ip = StringProperty("3243242")
+    address = StringProperty("32432423324324")
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -227,7 +230,7 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
         :return: screen
         """
         # fetch name.text
-        name
+        print("LOADED IOTSCREEN_LOADPAGE COMMAND?")
 
         # load the page for the device type and device name with the data and controls.
         # App.get_running_app().root.current = 'ScreenIOTControl'
@@ -337,6 +340,12 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
         self.ids.iotcontrol_box.add_widget(main_box)
 
         # add toolbar to root
+        # update manager ids
+        self.manager.name = name
+        self.manager.dev_type = dev_type
+        self.manager.ip = devices_storage[name]['ip']
+        self.manager.desc = devices_storage[name]['desc']
+
 
         App.get_running_app().root.current = 'ScreenIOTControl'
 
@@ -530,7 +539,6 @@ class ScreenHome(Screen):
             logging.debug("BINDING TO " + self.parent.item + " " + devices_storage[item]['device_type'])
 
 
-
     # update rectangle position and size
     def _update_rect(self, instance, value, *args):
         self.rect.size = instance.size
@@ -562,9 +570,10 @@ class DeviceCard(MDCardSwipe): # this one stores the name, desc, ip and type of 
                                                                                                devices_storage[name][
                                                                                                    'device_type'])
     def open(self):
-        lambda: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(self.name,
+        App.get_running_app().root.ids.screen_IOTControl_id.loadPage(self.name,
                                                                              devices_storage[self.name][
                                                                                  'device_type'])
+        print("OPENING")
 
 
 
@@ -573,6 +582,12 @@ class Manager(
     current = ObjectProperty()
     last_screen = ObjectProperty()
     splash_next = ObjectProperty()
+
+    # terrible workaround to get the screen to update, I hate but hopefully this will work.
+    name = StringProperty()
+    ip = StringProperty()
+    desc = StringProperty()
+    device = StringProperty()
 
 
 # have the toolbar inherit from Image and BoxLayout
