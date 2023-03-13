@@ -184,7 +184,7 @@
             ToolBar:
                 size_hint_y: 0.1
 
-
+# template for the cards :D - on the way to launch!
 <DeviceCard>:
     size_hint_x: 1
     MDCardSwipeLayerBox:
@@ -216,7 +216,8 @@
                 MDLabel:
                     text: root.name+"\n"+root.desc+"\n"+root.ip
                     halign: "center"
-                    size_hint_x: 1
+                    size_hint_x: 0.9
+                    size_hint_y: 1
                 MDIcon:
                     pos_hint: {"center_x": .5, "center_y": .5}
                     icon: "lightbulb-on"
@@ -225,7 +226,8 @@
                     # set size to change with the screen
                     size: self.texture_size
                     # set the size of the icon to be the same as the text
-                    icon_size: root.size
+                    font_size: self.height * 1
+
 
 
 
