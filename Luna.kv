@@ -186,8 +186,6 @@
 
 
 <DeviceCard>:
-
-    size_hint_y: None
     size_hint_x: 1
     MDCardSwipeLayerBox:
         # delete me
@@ -197,15 +195,29 @@
                 root.parent.remove_widget(root)
                 # update the database
 
-
-
     MDCardSwipeFrontBox:
+        size_hint_y: 1
+        # on release
+        # show the name of the card
+        on_release:
+            root.open()
 
         OneLineListItem:
+            size_hint_y: 1
             id: card_name
         # show name of root.name
-            text: root.name
+            BoxLayout:
+                orientation: "horizontal"
+                # center
+                MDIcon:
 
+                    icon: "lightbulb-on"
+                    halign: "center"
+                    size_hint_x: 0.1
+                MDLabel:
+                    text: root.name+"\n"+root.desc+"\n"+root.ip
+                    halign: "center"
+                    size_hint_x: 0.9
 
 
 

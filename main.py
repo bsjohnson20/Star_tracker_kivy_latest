@@ -13,6 +13,7 @@ from kivy.metrics import \
 from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty  # string property, used for storing strings
 from kivy.storage.jsonstore import JsonStore  # use for storing data
+from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.boxlayout import BoxLayout  # box layout, used for making boxes
 from kivy.uix.button import Button  # button, used for making buttons and making users click them and get mad at you
 from kivy.uix.gridlayout import GridLayout
@@ -511,7 +512,7 @@ class ScreenHome(Screen):
             self.parent.item = item
 
             # create THE Box this'll contain labels and the buton to open the corresponding IOT panel
-            Box = DeviceCard(name=item, ip=devices_storage[item]['ip'], desc=devices_storage[item]['desc'], device=devices_storage[item]['device_type'], size_hint_y=None, height=200, pos_hint={'center_x': 0.5, 'center_y': 0.5})
+            Box = DeviceCard(name=item, ip=devices_storage[item]['ip'], desc=devices_storage[item]['desc'], device=devices_storage[item]['device_type'], size_hint_y=None)
             # add color to Box
             # make it pretty
             # it didn't work :(, I wish It did. Then I could be a genius.
@@ -560,9 +561,10 @@ class DeviceCard(MDCardSwipe): # this one stores the name, desc, ip and type of 
         self.on_release = lambda: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(name,
                                                                                                devices_storage[name][
                                                                                                    'device_type'])
-        self.padding = 4
-        self.size_hint_x = 0.8
-        self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+    def open(self):
+        lambda: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(self.name,
+                                                                             devices_storage[self.name][
+                                                                                 'device_type'])
 
 
 
