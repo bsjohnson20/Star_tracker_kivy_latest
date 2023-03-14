@@ -313,7 +313,7 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
         # controls:
         # box
         controls_box = BoxLayout(orientation="horizontal", spacing=10, padding=10, size_hint=(1,
-                                                                                              0.5))  # control that brain of yours, and make it do what you want it to do. and actually do it, not just think about it.
+                                                                                                0.5))  # control that brain of yours, and make it do what you want it to do. and actually do it, not just think about it.
         controls_box.size_hint_x = 1
         # actual
         forw = MDRectangleFlatButton(text="forward", on_press=lambda x: print("Forward"))
