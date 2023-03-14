@@ -58,7 +58,7 @@ class ScreenAboutMe(Screen):  # What about me?
 
 
 class IOT_toolbar(BoxLayout):  # toolbar, used for making the toolbar. Make it explode! OR the stakeholder will explode!
-    name = StringProperty("Test")
+    dev_name = StringProperty("Test")
     ip = StringProperty("3243242")
     address = StringProperty("32432423324324")
     def __init__(self, **kwargs):
@@ -101,7 +101,7 @@ class IOT_toolbar(BoxLayout):  # toolbar, used for making the toolbar. Make it e
 # DeviceSettings page
 class DeviceSettings(
     Screen):  # settings, used making settings, and having too many settings, and making the user explode because they have too many settings.
-    name = StringProperty("Test")
+    dev_name = StringProperty("Test")
     ip = StringProperty("3243242")
     desc = StringProperty("32432423324324")
 
@@ -123,13 +123,13 @@ class DeviceSettings(
         # update StringProperties
 
         # log values
-        logging.info(f"Name: {self.name}")
+        logging.info(f"Name: {self.dev_name}")
         logging.info(f"Desc: {self.desc}")
         logging.info(f"IP: {self.ip}")
 
-    def save(self, name, ip, desc):
+    def save(self, dev_name, ip, desc):
         new_ip = ip
-        new_name = name
+        new_name = dev_name
         new_desc = desc
 
         # validate using ValidatingTool
@@ -148,7 +148,7 @@ class DeviceSettings(
             # set the values in IOT_screen
             print("beforebefore")
             # new name error, not here? Then? Where?
-            self.name, self.desc, self.ip = new_name, new_desc, new_ip
+            self.dev_name, self.desc, self.ip = new_name, new_desc, new_ip
             self.manager.get_screen('ScreenIOTControl').ids['name'].text = new_name
             self.manager.get_screen('ScreenIOTControl').ids['desc'].text = new_desc
             self.manager.get_screen('ScreenIOTControl').ids['ip'].text = new_ip
@@ -158,12 +158,12 @@ class DeviceSettings(
 
 def fetchvalues():  # fetches values from the IOT screen so we can use in the setting screen
     # fetch values from the IOT screen
-    name = App.get_running_app().root.ids['screen_IOTControl_id'].ids['name'].text
+    dev_name = App.get_running_app().root.ids['screen_IOTControl_id'].ids['name'].text
     dev_type = App.get_running_app().root.ids['screen_IOTControl_id'].ids['dev_type'].text
     ip = App.get_running_app().root.ids['screen_IOTControl_id'].ids['ip'].text
     desc = App.get_running_app().root.ids['screen_IOTControl_id'].ids['desc'].text
     print(f"values")
-    return name, dev_type, ip, desc
+    return dev_name, dev_type, ip, desc
 
 
 class OnlineCheck():  # checking if the device is online - pretty sure this is defunct, I just cant be bothered to delete it
@@ -190,14 +190,14 @@ class OnlineCheck():  # checking if the device is online - pretty sure this is d
 
 
 class onlineButton(MDIconButton):  # button to check if online
-    def __init__(self, name, **kwargs):
+    def __init__(self, dev_name, **kwargs):
         super().__init__(**kwargs)
         self.icon = "refresh"
-        self.name = name
+        self.dev_name = dev_name
 
     def on_press(self):
         # get ip address from device_storage
-        ip = devices_storage.get(self.name)['ip']
+        ip = devices_storage.get(self.dev_name)['ip']
         # run thread to check if online
         self.thread = threading.Thread(target=self.check_online, args=(ip,))
         self.thread.start()
@@ -216,26 +216,26 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # create object properties
-        self.name = ""
+        self.dev_name = ""
         self.dev_type = ""
         self.ip = ""
         self.desc = ""
 
-    def loadPage(self, name, dev_type, **kwargs):  # assembles the IOT screen and your big brain
+    def loadPage(self, dev_name, dev_type, **kwargs):  # assembles the IOT screen and your big brain
         """
-        Load the page for the device type and device name with the data and controls.
-        :param name:
+        Load the page for the device type and device dev_name with the data and controls.
+        :param dev_name:
         :param dev_type:
         :param kwargs:
         :return: screen
         """
-        # fetch name.text
+        # fetch dev_name.text
         print("LOADED IOTSCREEN_LOADPAGE COMMAND?")
 
-        # load the page for the device type and device name with the data and controls.
+        # load the page for the device type and device dev_name with the data and controls.
         # App.get_running_app().root.current = 'ScreenIOTControl'
-        # devices_storage[caller_name]
-        logging.debug(f"name: {name}, dev_type: {dev_type}")
+        # devices_storage[caller_dev_name]
+        logging.debug(f"dev_name: {dev_name}, dev_type: {dev_type}")
 
         # clear the boxlayout
         self.ids.iotcontrol_box.clear_widgets()
@@ -255,7 +255,7 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
                              pos_hint={'center_x': 0, 'center_y': 0.5})
 
         # setup class for device
-        device_class = OnlineCheck(devices_storage[name]['ip'],
+        device_class = OnlineCheck(devices_storage[dev_name]['ip'],
                                    port=5000)  # this is the class that checks if the device is online, I am not sure if it works, I just cant be bothered to delete it. actually I think it does work, but I am not sure.
 
         # Create the info screen part
@@ -273,17 +273,17 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
         # add labels to gridlayout
         info_grid.add_widget(Label(
             text="Name"))  # this hellhole of a line of code is just a label, with more labels to come. I am a genius.
-        nam = Label(text=name)
+        nam = Label(text=dev_name)
         info_grid.add_widget(nam)
         info_grid.add_widget(Label(text="Type"))
         devType = Label(text=dev_type)
         info_grid.add_widget(devType)
         info_grid.add_widget(Label(text="IP"))
-        ip_lab = Label(text=devices_storage[name]['ip'])
+        ip_lab = Label(text=devices_storage[dev_name]['ip'])
         info_grid.add_widget(ip_lab)
         desc = Label(text="Description")
         info_grid.add_widget(desc)
-        info_grid.add_widget(Label(text=devices_storage[name]['desc']))
+        info_grid.add_widget(Label(text=devices_storage[dev_name]['desc']))
 
         # setup ids for info card
         self.ids['name'] = nam  # this is the part where I set the ids for the labels, so I can change them later.
@@ -299,7 +299,7 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
         # Wifi Box setup
         stat = MDLabel(text="Status")
         off = MDLabel(text="Offline")
-        online = onlineButton(name=name, on_press=device_class.is_online, size_hint=(0.1, 0.5),
+        online = onlineButton(dev_name=dev_name, on_press=device_class.is_online, size_hint=(0.1, 0.5),
                               pos_hint={'center_x': 0.5, 'center_y': 0.5})
         online.size_hint_x = 0.1
         online.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
@@ -341,10 +341,10 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
 
         # add toolbar to root
         # update manager ids
-        self.manager.name = name
+        self.manager.dev_name = dev_name
         self.manager.dev_type = dev_type
-        self.manager.ip = devices_storage[name]['ip']
-        self.manager.desc = devices_storage[name]['desc']
+        self.manager.ip = devices_storage[dev_name]['ip']
+        self.manager.desc = devices_storage[dev_name]['desc']
 
 
         App.get_running_app().root.current = 'ScreenIOTControl'
@@ -433,17 +433,17 @@ class ScreenAddDevice(
         # check if dev type is not unselcted
         # check if ip is valid
         # check if name is already in dict
-        if not ValidatingTool.empty_data(self, temp.name.text, temp.ip_id.text, temp.desc.text):
+        if not ValidatingTool.empty_data(self, temp.dev_name.text, temp.ip_id.text, temp.desc.text):
             popup("Please fill in all fields")
         elif not ValidatingTool.checkDevType(self, temp.dropdown_opener.text):
             popup("Please select a device type")
         elif not ValidatingTool.checkIP(self, temp.ip_id.text):
             popup("Please enter a valid IP")
-        elif temp.name.text in devices_storage:
+        elif temp.dev_name.text in devices_storage:
             popup("Name already in use")
         else:
             # add to dict
-            devices_storage.put(temp.name.text, desc=temp.desc.text, ip=temp.ip_id.text,
+            devices_storage.put(temp.dev_name.text, desc=temp.desc.text, ip=temp.ip_id.text,
                                 device_type=temp.dropdown_opener.text)
             App.get_running_app().root.current = "ScreenHome"
             App.get_running_app().root.ids.screen_Home_id.setup()
@@ -491,10 +491,10 @@ class Deletethis(MDIconButton):
         self.icon_size = "64dp"
         self.font_size = "64dp"
 
-    def removeFromDatabase(self, name):
+    def removeFromDatabase(self, dev_name):
         # fetch name to delete
         # delete from database
-        devices_storage.delete(name)
+        devices_storage.delete(dev_name)
 
 class ScreenHome(Screen):
     def __init__(self, **kwargs):
@@ -521,7 +521,7 @@ class ScreenHome(Screen):
             self.parent.item = item
 
             # create THE Box this'll contain labels and the buton to open the corresponding IOT panel
-            Box = DeviceCard(name=item, ip=devices_storage[item]['ip'], desc=devices_storage[item]['desc'], device=devices_storage[item]['device_type'], size_hint_y=None)
+            Box = DeviceCard(dev_name=item, ip=devices_storage[item]['ip'], desc=devices_storage[item]['desc'], device=devices_storage[item]['device_type'], size_hint_y=None)
             # add color to Box
             # make it pretty
             # it didn't work :(, I wish It did. Then I could be a genius.
@@ -554,24 +554,24 @@ class ScreenMain(
 
 # testing
 class DeviceCard(MDCardSwipe): # this one stores the name, desc, ip and type of the device, and a button to open the IOT panel for it. Probably...
-    name = StringProperty()
+    dev_name = StringProperty()
     device = StringProperty()
     ip = StringProperty()
     desc = StringProperty()
 
 
-    def __init__(self, name, ip, desc, device, **kwargs):
+    def __init__(self, dev_name, ip, desc, device, **kwargs):
         super().__init__(**kwargs)
-        self.name = name
+        self.dev_name = dev_name
         self.device = device
         self.ip = ip
         self.desc = desc
-        self.on_release = lambda: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(name,
-                                                                                               devices_storage[name][
+        self.on_release = lambda: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(dev_name,
+                                                                                               devices_storage[dev_name][
                                                                                                    'device_type'])
     def open(self):
-        App.get_running_app().root.ids.screen_IOTControl_id.loadPage(self.name,
-                                                                             devices_storage[self.name][
+        App.get_running_app().root.ids.screen_IOTControl_id.loadPage(self.dev_name,
+                                                                             devices_storage[self.dev_name][
                                                                                  'device_type'])
         print("OPENING")
 
@@ -584,7 +584,7 @@ class Manager(
     splash_next = ObjectProperty()
 
     # terrible workaround to get the screen to update, I hate but hopefully this will work.
-    name = StringProperty()
+    dev_name = StringProperty()
     ip = StringProperty()
     desc = StringProperty()
     device = StringProperty()

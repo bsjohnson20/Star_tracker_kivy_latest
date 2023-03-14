@@ -191,14 +191,14 @@
         # delete me
         Deletethis:
             on_release:
-                self.removeFromDatabase(root.name)
+                self.removeFromDatabase(root.dev_name)
                 root.parent.remove_widget(root)
                 # update the database
 
     MDCardSwipeFrontBox:
         size_hint_y: 1
         # on release
-        # show the name of the card
+        # show the dev_name of the card
         on_release:
             root.open()
 
@@ -214,7 +214,7 @@
                 # center
 
                 MDLabel:
-                    text: root.name+"\n"+root.desc+"\n"+root.ip
+                    text: root.dev_name+"\n"+root.desc+"\n"+root.ip
                     halign: "center"
                     size_hint_x: 0.9
                     size_hint_y: 1
@@ -263,7 +263,7 @@
             # scale toolbar to 10% of screen height
             IOT_toolbar:
                 # set name, desc and ip
-                name: root.name
+                dev_name: root.dev_name
                 desc: root.desc
                 ip: root.ip
 
@@ -304,13 +304,13 @@
 
 <DeviceSettings>:
     on_enter:
-        print(root.manager.name)
-        self.name = root.manager.name
+        print(root.manager.dev_name)
+        self.dev_name = root.manager.dev_name
         self.desc = root.manager.desc
         self.ip = root.manager.ip
 
         # update the text inputs
-        self.ids.nameInput.text = root.manager.name
+        self.ids.nameInput.text = root.manager.dev_name
         self.ids.descInput.text = root.manager.desc
         self.ids.ipInput.text = root.manager.ip
 
@@ -338,7 +338,7 @@
                     text: "Name"
                 TextInput:
                     id: nameInput
-                    text: root.name
+                    text: root.dev_name
                 MDLabel:
                     text: "Desc"
                 TextInput:
@@ -370,7 +370,7 @@
                 icon: "content-save"
                 on_release:
                     # fetch ids for text inputs
-                    root.save(name=self.parent.parent.parent.ids.nameInput.text, desc=self.parent.parent.parent.ids.descInput.text, ip=self.parent.parent.parent.ids.ipInput.text)
+                    root.save(dev_name=self.parent.parent.parent.ids.nameInput.text, desc=self.parent.parent.parent.ids.descInput.text, ip=self.parent.parent.parent.ids.ipInput.text)
 
 
 <ScreenAboutMe>:
