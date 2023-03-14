@@ -2,8 +2,6 @@ import logging
 import os
 import socket
 import threading  # look at how many threads are running, if too many, just add more. Make user explode.
-import \
-    requests as requests  # requesting the local number of people in your house, there are 2 people in your house, 1 is you, 1 is your mom. You are the only one using the app, so you are the only one that is counted. If you are not home, then the app will not work.
 import trio
 from kivy.app import App  # the beloved app
 from kivy.core.window import Window  # windows 12, the best windows
