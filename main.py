@@ -1,10 +1,8 @@
-import logging
 import os
-import socket
 import threading  # look at how many threads are running, if too many, just add more. Make user explode.
 import trio
 from kivy.app import App  # the beloved app
-from kivy.core.window import Window  # windows 12, the best windows
+from kivy.core.window import Window  # Windows 12, the best windows
 from kivy.graphics import Color, Rectangle, Canvas
 from kivy.metrics import \
     dp  # density pixels, used for scaling, 1 dp = 1 pixel on a 160 dpi screen, 2 pixels on a 320 dpi screen, 4 pixels on a 640 dpi screen, and so on. Unfortunatly, this is not the case for all devices, so you have to use the kivy.metrics module to get the correct scaling. cry
@@ -40,10 +38,10 @@ from kivy.config import Config
 Config.set('graphics', 'resizable', '1')
 
 # setup log for debugging
-logging.basicConfig(filename='debug.log', level=logging.DEBUG, format='%(asctime)s:%(levelname)s:%(message)s')
+
 
 # test log
-logging.debug('Started program')
+print('Started program')
 
 
 class ScreenWelcome(Screen):
@@ -80,16 +78,16 @@ class IOT_toolbar(BoxLayout):  # toolbar, used for making the toolbar. Make it e
 
         # log using logging module
         self.add_widget(box)
-        logging.debug("Created toolbar")
+        print("Created toolbar")
         print('added toolbar')
 
     def back(self, *args):
         App.get_running_app().root.current = "ScreenHome"
         # debug log using logging module
-        logging.debug("Going back to home screen")
+        print("Going back to home screen")
 
     def settings(self, *args):
-        logging.debug("Going to settings screen")
+        print("Going to settings screen")
         print(f"Log self: {self}, args: {args}")
         App.get_running_app().root.current = "DeviceSettings"  # self.parent.parent.manager.current = "DeviceSettings"
         # set screen to DeviceSettings
@@ -121,9 +119,9 @@ class DeviceSettings(
         # update StringProperties
 
         # log values
-        logging.info(f"Name: {self.dev_name}")
-        logging.info(f"Desc: {self.desc}")
-        logging.info(f"IP: {self.ip}")
+        print(f"Name: {self.dev_name}")
+        print(f"Desc: {self.desc}")
+        print(f"IP: {self.ip}")
 
     def save(self, dev_name, ip, desc):
         new_ip = ip
@@ -132,12 +130,12 @@ class DeviceSettings(
 
         # validate using ValidatingTool
         if not ValidatingTool.checkIP(self, ip=new_ip):
-            logging.debug("Invalid IP")
+            print("Invalid IP")
             # summon popup
             popup("Invalid IP", "Please enter a valid IP in format num.num.num.num")
 
         elif not ValidatingTool.empty_data(self, new_name, new_desc, new_ip):
-            logging.debug("Invalid Name")
+            print("Invalid Name")
             # summon popup
             popup("Invalid Name", "Please ensure all fields are filled")
 
@@ -233,7 +231,7 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
         # load the page for the device type and device dev_name with the data and controls.
         # App.get_running_app().root.current = 'ScreenIOTControl'
         # devices_storage[caller_dev_name]
-        logging.debug(f"dev_name: {dev_name}, dev_type: {dev_type}")
+        print(f"dev_name: {dev_name}, dev_type: {dev_type}")
 
         # clear the boxlayout
         self.ids.iotcontrol_box.clear_widgets()
@@ -361,9 +359,20 @@ class ValidatingTool:  # useful but useless inheritance, equal to 0 dollars.
 
     def checkIP(self, ip):  # check if ip is valid
         try:
-            socket.inet_aton(ip)
-            # valid
-            return True
+            ip = ip.split(".")
+            for i in ip:
+                if int(i) > 255:
+                    return False
+                elif int(i) < 0:
+                    return False
+                elif len(ip) != 4:
+                    return False
+                elif ip[0] == "0":
+                    return False
+                else:
+                    pass
+                    # valid
+                    return True
         except:
             # invalid
             return False
@@ -447,7 +456,7 @@ class ScreenAddDevice(
             App.get_running_app().root.ids.screen_Home_id.setup()
 
     def callback(self, text_item, dropdown):
-        logging.debug(text_item)
+        print(text_item)
         drop = App.get_running_app().root.ids.screen_Add_id.ids.dropdown_opener
         drop.text = text_item
         # close the dropdown
@@ -512,7 +521,7 @@ class ScreenHome(Screen):
         for child in [child for child in
                       self.children]:  # clear screen - this lets us update the screen as well! - no this isn't a lazy workaround so I don't have to append instead... and write a new builder
             self.remove_widget(child)
-        logging.debug(devices_storage.count())
+        print(devices_storage.count())
         for item in devices_storage:
             print(item)
             new = codeinpain(item, devices_storage[item]['device_type'])
@@ -534,7 +543,7 @@ class ScreenHome(Screen):
             Box.size_hint_x = 1
             print(Box.ids)
             # clickable image
-            logging.debug("BINDING TO " + self.parent.item + " " + devices_storage[item]['device_type'])
+            print("BINDING TO " + self.parent.item + " " + devices_storage[item]['device_type'])
 
 
     # update rectangle position and size
@@ -661,7 +670,7 @@ class AddButton(MDIconButton):  # this is getting out of hand, I am a genius.
         # self.size = (50, 50)
         self.on_release = changeScreenAdd
         self.background = "black"
-        logging.debug(self.size)
+        print(self.size)
 
 
 class MeButton(MDIconButton):  # This is me, I am that button. I am a genius.
@@ -735,7 +744,7 @@ class LunaApp(
 
 class ScreenCredits(Screen):  # I am the absolute best, I am a god, and I am a genius.
     def on_enter(self, *args):
-        logging.debug("ENTERED CREDITS SCREEN")  # Say hello to princess Luna, I am a genius.
+        print("ENTERED CREDITS SCREEN")  # Say hello to princess Luna, I am a genius.
 
 
 if __name__ == "__main__":  # boilerplate code to boil the plate, I am a genius.
