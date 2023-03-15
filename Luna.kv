@@ -7,7 +7,7 @@
 
 #<ContextButton@Button>:
  #   size: 120, 40
-
+# say hello
 
 
 
@@ -50,6 +50,7 @@
     ScreenCredits:
         id: screen_credits_id
         name: "ScreenCredits"
+
 
 
 
@@ -172,10 +173,10 @@
                 halign:"center"
             # Cards go here - build a generator for them...
             ScrollView:
-
+                scroll_distance: 100
                 size_hint_x: 1
 
-                StackLayout:
+                MDList:
                     size_hint_y:None
                     height: self.minimum_height
                     spacing: 10
@@ -183,7 +184,49 @@
             ToolBar:
                 size_hint_y: 0.1
 
+# template for the cards :D - on the way to launch!
+<DeviceCard>:
+    size_hint_x: 1
+    MDCardSwipeLayerBox:
+        # delete me
+        Deletethis:
+            on_release:
+                self.removeFromDatabase(root.dev_name)
+                root.parent.remove_widget(root)
+                # update the database
 
+    MDCardSwipeFrontBox:
+        size_hint_y: 1
+        # on release
+        # show the dev_name of the card
+        on_release:
+            root.open()
+
+        OneLineListItem:
+            size_hint_y: 1
+            id: card_name
+            on_release:
+                print("card name pressed")
+                root.open()
+        # show name of root.name
+            BoxLayout:
+                orientation: "horizontal"
+                # center
+
+                MDLabel:
+                    text: root.dev_name+"\n"+root.desc+"\n"+root.ip
+                    halign: "center"
+                    size_hint_x: 0.9
+                    size_hint_y: 1
+                MDIcon:
+                    pos_hint: {"center_x": .5, "center_y": .5}
+                    icon: "lightbulb-on"
+                    halign: "center"
+                    size_hint_x: 0.1
+                    # set size to change with the screen
+                    size: self.texture_size
+                    # set the size of the icon to be the same as the text
+                    font_size: self.height * 1
 
 
 
@@ -219,6 +262,12 @@
                     size: self.size
             # scale toolbar to 10% of screen height
             IOT_toolbar:
+                # set name, desc and ip
+                dev_name: root.dev_name
+                desc: root.desc
+                ip: root.ip
+
+
 
 
             # scale x to 100% of screen width
@@ -255,15 +304,16 @@
 
 <DeviceSettings>:
     on_enter:
-        # update self variables by copying the values from ScreenIOTControl
-        self.name = self.parent.ids.screen_IOTControl_id.ids.name.text
-        self.desc = self.parent.ids.screen_IOTControl_id.ids.desc.text
-        self.ip = self.parent.ids.screen_IOTControl_id.ids.ip.text
+        print(root.manager.dev_name)
+        self.dev_name = root.manager.dev_name
+        self.desc = root.manager.desc
+        self.ip = root.manager.ip
 
         # update the text inputs
-        self.ids.nameInput.text = self.name
-        self.ids.descInput.text = self.desc
-        self.ids.ipInput.text = self.ip
+        self.ids.nameInput.text = root.manager.dev_name
+        self.ids.descInput.text = root.manager.desc
+        self.ids.ipInput.text = root.manager.ip
+
     BoxLayout:
         orientation: 'vertical'
         BoxLayout:
@@ -288,7 +338,7 @@
                     text: "Name"
                 TextInput:
                     id: nameInput
-                    text: root.name
+                    text: root.dev_name
                 MDLabel:
                     text: "Desc"
                 TextInput:
@@ -309,6 +359,7 @@
                 size_hint_x: 1
                 text: "Back"
                 on_release:
+
                     root.manager.current = "ScreenIOTControl"
                     root.manager.last_screen = "DeviceSettings"
                 icon: "arrow-left"
@@ -319,7 +370,7 @@
                 icon: "content-save"
                 on_release:
                     # fetch ids for text inputs
-                    root.save(name=self.parent.parent.parent.ids.nameInput.text, desc=self.parent.parent.parent.ids.descInput.text, ip=self.parent.parent.parent.ids.ipInput.text)
+                    root.save(dev_name=self.parent.parent.parent.ids.nameInput.text, desc=self.parent.parent.parent.ids.descInput.text, ip=self.parent.parent.parent.ids.ipInput.text)
 
 
 <ScreenAboutMe>:

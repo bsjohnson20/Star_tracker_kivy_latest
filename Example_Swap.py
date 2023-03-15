@@ -1,7 +1,6 @@
 from kivy.app import App
-from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import ObjectProperty
-from kivy.core.window import Window
+from kivy.uix.screenmanager import ScreenManager, Screen
 
 
 class ScreenMain(Screen):
@@ -14,6 +13,7 @@ class ScreenOne(Screen):
 
 class ScreenTwo(Screen):
     pass
+
 
 class WelcomeScreen(Screen):
     pass
@@ -54,7 +54,8 @@ class LunaApp(App):
             self.root.current = 'ScreenMain'
         print('This is the return value: ', value)
 
-        self.root.current='Screen2'
+        self.root.current = 'Screen2'
 
-if __name__ =="__main__":
+
+if __name__ == "__main__":
     LunaApp().run()
