@@ -1,6 +1,7 @@
 import os
 import threading  # look at how many threads are running, if too many, just add more. Make user explode.
 import trio
+
 from kivy.app import App  # the beloved app
 from kivy.core.window import Window  # Windows 12, the best windows
 from kivy.graphics import Color, Rectangle, Canvas
