@@ -350,24 +350,32 @@
             orientation: 'vertical'
             size_hint_y: 0.9
             # name, desc and IP labels
-            GridLayout:
+            BoxLayout:
+                orientation: 'vertical'
                 id: deviceSettings_grid
                 padding: 20
                 spacing: 20
                 cols: 2
-                MDLabel:
-                    text: "Name"
-                TextInput:
+
+                MDTextField:
+                    hint_text: "Name"
+                    helper_text: "Enter a name for the device"
+                    helper_text_mode: "on_focus"
+
                     id: nameInput
                     text: root.dev_name
-                MDLabel:
-                    text: "Desc"
-                TextInput:
+                MDTextField:
+                    hint_text: "Description"
+                    helper_text: "Enter a description for the device"
+                    helper_text_mode: "on_focus"
+                    multiline: False
                     id: descInput
                     text: root.desc
-                MDLabel:
-                    text: "IP"
-                TextInput:
+                MDTextField:
+                    hint_text: "Description"
+                    helper_text: "Enter a description for the device"
+                    helper_text_mode: "on_focus"
+                    multiline: False
                     id: ipInput
                     text: root.ip
 
