@@ -108,37 +108,37 @@
             halign:"center"
             # center
             pos_hint: {"center_x": .5, "center_y": .5}
-        GridLayout:
+        StackLayout:
             id: addDevice_grid
             padding: 20
             spacing: 20
-
-            cols: 2
-            MDLabel:
-                text: "Name"
-            TextInput:
+            MDTextField:
+                hint_text: "Name"
+                helper_text: "Enter a name for the device"
+                helper_text_mode: "on_focus"
                 multiline: False
                 id: name
                 font_size: self.height * 0.5
-            MDLabel:
-                text: "Desc"
-            TextInput:
+
+            MDTextField:
+                hint_text: "Description"
+                helper_text: "Enter a description for the device"
+                helper_text_mode: "on_focus"
                 multiline: False
                 id: desc
                 font_size: self.height * 0.5
-            MDLabel:
-                text: "IP"
-            TextInput:
+            MDTextField:
+                hint_text: "IP Address"
+                helper_text: "Enter a valid IP address in the format x.x.x.x"
+                helper_text_mode: "on_focus"
                 id: ip_id
                 multiline: False
                 font_size: self.height * 0.5
-            MDLabel:
-                text: "Device"
             MDRectangleFlatButton:
                 text: "Device Types"
                 id: dropdown_opener
                 size_hint_x: 1
-                size_hint_y: 0.8
+                size_hint_y: 0.2
 
 
         BoxLayout:
