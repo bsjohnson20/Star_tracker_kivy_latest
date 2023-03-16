@@ -442,7 +442,7 @@ class ScreenAddDevice(
         # check if dev type is not unselcted
         # check if ip is valid
         # check if name is already in dict
-        if not ValidatingTool.empty_data(self, temp.dev_name.text, temp.ip_id.text, temp.desc.text):
+        if not ValidatingTool.empty_data(self, temp.dev_name.text, temp.ip_id.text, temp.description.text):
             popup("Please fill in all fields")
         elif not ValidatingTool.checkDevType(self, temp.dropdown_opener.text):
             popup("Please select a device type")
@@ -452,7 +452,7 @@ class ScreenAddDevice(
             popup("Name already in use")
         else:
             # add to dict
-            devices_storage.put(temp.dev_name.text, desc=temp.desc.text, ip=temp.ip_id.text,
+            devices_storage.put(temp.dev_name.text, desc=temp.description.text, ip=temp.ip_id.text,
                                 device_type=temp.dropdown_opener.text)
             App.get_running_app().root.current = "ScreenHome"
             App.get_running_app().root.ids.screen_Home_id.setup()
