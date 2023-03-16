@@ -51,7 +51,23 @@
         id: screen_credits_id
         name: "ScreenCredits"
 
+<Toolbar>:
+    # make back canvas
+    canvas:
+        Color:
+            # make it purple
+            # use app theme
+            rgba: app.theme_cls.primary_color
 
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    AddButton:
+        size_hint_x: 1
+    HomeButton:
+        size_hint_x: 1
+    MeButton:
+        size_hint_x: 1
 
 
 <ScreenWelcome>:
@@ -132,7 +148,9 @@
             canvas:
                 Color:
                     # make it purple
-                    rgba: 0.75, 0, 0.5, 1
+                    # use app theme
+                    rgba: app.theme_cls.primary_color
+
                 Rectangle:
                     pos: self.pos
                     size: self.size
@@ -256,7 +274,7 @@
             canvas:
                 Color:
                     # make it purple
-                    rgba: 0.75, 0, 0.5, 1
+                    rgba: app.theme_cls.primary_color
                 Rectangle:
                     pos: self.pos
                     size: self.size
@@ -428,7 +446,7 @@
             canvas:
                 Color:
                     # make it purple
-                    rgba: 0.75, 0, 0.5, 1
+                    rgba: app.theme_cls.primary_color
                 Rectangle:
                     pos: self.pos
                     size: self.size

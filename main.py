@@ -19,6 +19,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
+from kivy.utils import rgba
 from kivymd.app import MDApp
 from kivymd.uix.button import MDIconButton, MDRectangleFlatButton
 from kivymd.uix.card import MDCard, MDCardSwipe
@@ -605,25 +606,16 @@ class ToolBar(BoxLayout):
         # set orientation to horizontal
         self.orientation = 'horizontal'
         # Canvas
-        with self.canvas.before:
-            # set color to purple
-            Color(0.5, 0, 0.5, 1)
-            # draw a rectangle
-            self.rect = Rectangle(size=self.size, pos=self.pos)
+        print(f"ids: {self.ids}")
+        add_to = self
         # bind size and position to update rectangle
-        self.bind(size=self.update_rect, pos=self.update_rect)
-        self.add_widget(AddButton())
-        self.add_widget(HomeButton())
-        self.add_widget(MeButton())
-        # set background color to purple
-        self.background_color = (0.5, 0, 0.5, 1)
+
+
         # update size on window resize
         # add padding to half the width of root screen
 
     # function to update size on resize
-    def update_rect(self, *args):
-        self.rect.pos = self.pos
-        self.rect.size = self.size
+
 
     # function to update size on resize
 
