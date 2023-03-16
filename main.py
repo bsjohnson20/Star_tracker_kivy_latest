@@ -45,6 +45,9 @@ Config.set('graphics', 'resizable', '1')
 # test log
 print('Started program')
 
+class DeviceDataPage(Widget): # inputs for device data. Standardised to cause less confusion. Actually, it causes more confusion. Just kidding, it causes even more confusion.
+    pass
+
 
 class ScreenWelcome(Screen):
     def generateScreen(self):
@@ -530,7 +533,7 @@ class ScreenHome(Screen):
             self.parent.item = item
 
             # create THE Box this'll contain labels and the buton to open the corresponding IOT panel
-            Box = DeviceCard(dev_name=item, ip=devices_storage[item]['ip'], desc=devices_storage[item]['desc'], device=devices_storage[item]['device_type'], size_hint_y=None)
+            Box = DeviceCard(dev_name=item, ip=devices_storage[item]['ip'], desc=devices_storage[item]['desc'], device=devices_storage[item]['device_type'])
             # add color to Box
             # make it pretty
             # it didn't work :(, I wish It did. Then I could be a genius.

@@ -51,6 +51,32 @@
         id: screen_credits_id
         name: "ScreenCredits"
 
+<DeviceDataPage>:
+    BoxLayout:
+        MDTextField:
+            hint_text: "Name"
+            helper_text: "Enter a name for the device"
+            helper_text_mode: "on_focus"
+            multiline: False
+            id: dev_name
+            font_size: self.height * 0.5
+
+        MDTextField:
+            hint_text: "Description"
+            helper_text: "Enter a description for the device"
+            helper_text_mode: "on_focus"
+            multiline: False
+            id: description
+            font_size: self.height * 0.5
+        MDTextField:
+            hint_text: "IP Address"
+            helper_text: "Enter a valid IP address in the format x.x.x.x"
+            helper_text_mode: "on_focus"
+            id: ip_id
+            multiline: False
+            font_size: self.height * 0.5
+
+
 <Toolbar>:
     # make back canvas
     canvas:
@@ -192,19 +218,21 @@
             # Cards go here - build a generator for them...
             ScrollView:
                 scroll_distance: 100
-                size_hint_x: 1
+                size_hint_x: 1s
 
-                MDList:
+                MDStackLayout:
                     size_hint_y:None
                     height: self.minimum_height
-                    spacing: 10
+                    # 10 pixels in dp for spacing
+                    spacing: dp(10)
                     id: add_here
             ToolBar:
                 size_hint_y: 0.1
 
 # template for the cards :D - on the way to launch!
 <DeviceCard>:
-    size_hint_x: 1
+    size_hint_y: None
+    size_hint_x: 0.2
     MDCardSwipeLayerBox:
         # delete me
         Deletethis:
