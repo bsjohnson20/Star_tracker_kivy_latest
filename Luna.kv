@@ -321,6 +321,9 @@
 
 
 <DeviceSettings>:
+
+
+
     on_enter:
         print(root.manager.dev_name)
         self.dev_name = root.manager.dev_name
@@ -373,6 +376,14 @@
         BoxLayout: # toolbar
             orientation: 'horizontal'
             size_hint_y: 0.1
+            # theme
+            canvas:
+                Color:
+                    # make it purple
+                    rgba: app.theme_cls.primary_color
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
             MDIconButton:
                 size_hint_x: 1
                 text: "Back"
