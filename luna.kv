@@ -142,12 +142,13 @@
 
 
         MDTextButton:
+            size_hint_y: None
+            text_size: self.parent.width, None
+            height: self.texture_size[1]*4
             text: 'Welcome to the\n Star Tracker IOT APP'
-            size_hint_y: 0.2
-            size_hint_x: 1
+
             halign:"center"
             # resize text to fit button
-            font_size: self.height * 0.5
             on_release:
                 root.manager.current = root.manager.splash_next
                 root.manager.last_screen = 'ScreenWelcome'
