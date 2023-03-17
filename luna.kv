@@ -309,10 +309,12 @@
 
                 MDLabel:
                     text: root.dev_name+"\n"+root.ip # simplify it
+                    pos_hint: {"center_x": .5, "center_y": .5}
                     halign: "center"
                     size_hint_x: 0.9
-                    size_hint_y: 1
-                    font_size: self.height * 0.5
+                    size_hint_y: None
+                    text_size: self.width, None
+                    height: self.texture_size[1]
                 MDIcon:
                     pos_hint: {"center_x": .5, "center_y": .5}
                     icon: "lightbulb-on"
@@ -412,7 +414,7 @@
         orientation: 'vertical'
 
         TitleLabel:
-            text: "Star Tracker Device Settings"
+            text: "Device Settings"
         BoxLayout:
             id: labels_box
             orientation: 'vertical'
