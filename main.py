@@ -45,6 +45,11 @@ Config.set('graphics', 'resizable', '1')
 # test log
 print('Started program')
 
+
+class TitleLabel(BoxLayout):
+    text = StringProperty("")
+
+
 class DeviceDataPage(Widget): # inputs for device data. Standardised to cause less confusion. Actually, it causes more confusion. Just kidding, it causes even more confusion.
     pass
 

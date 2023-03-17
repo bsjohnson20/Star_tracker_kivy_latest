@@ -50,6 +50,29 @@
     ScreenCredits:
         id: screen_credits_id
         name: "ScreenCredits"
+
+<TitleLabel>:
+    size_hint: 1, 0.1
+    BoxLayout:
+        orientation: "vertical"
+        MDLabel:
+            text: root.text
+            font_size: self.height * 0.5
+            halign: "center"
+            valign: "middle"
+            size_hint_y: 0.1
+            size_hint_x: 1
+            canvas:
+                Color:
+                    # make it purple
+                    # use app theme
+                    rgba: app.theme_primary
+
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+
 <SavedTheme@Popup>:
     title: "Saved Theme"
     size_hint: 0.5, 0.5
@@ -145,12 +168,8 @@
     BoxLayout:
 
         orientation: 'vertical'
-        MDLabel:
+        TitleLabel:
             text: "Star Tracker Add Device"
-            size_hint_y: 0.1
-            halign:"center"
-            # center
-            pos_hint: {"center_x": .5, "center_y": .5}
         StackLayout:
             id: addDevice_grid
             padding: 20
@@ -227,10 +246,10 @@
             id: homeScreen_HomeHome
             size_hint_y:0.9
             orientation: 'vertical'
-            MDLabel:
-                text: "Star Tracker Home"
-                size_hint_y: 0.1
-                size_hint_x: 1
+
+            # call TitleLabel class and set text to "Home"
+            TitleLabel:
+                text: "Home"
                 halign:"center"
             # Cards go here - build a generator for them...
             ScrollView:
@@ -301,9 +320,8 @@
         pos_hint: {"center_x": .5, "center_y": .5}
 
         orientation: 'vertical'
-        MDLabel:
+        TitleLabel:
             text: "Star Tracker IOT Control"
-            size_hint_y: 0.1
             halign:"center"
         BoxLayout:
             id: iotcontrol_box
@@ -340,9 +358,8 @@
         BoxLayout:
             size_hint_y: 0.1
             orientation: 'horizontal'
-            MDLabel:
+            TitleLabel:
                 text: "Star Tracker Credits"
-                size_hint_y: 0.1
                 halign:"center"
         MDLabel:
             size_hint_y: 0.1
@@ -382,14 +399,9 @@
 
     BoxLayout:
         orientation: 'vertical'
-        BoxLayout:
 
-            size_hint_y: 0.1
-            orientation: 'horizontal'
-            MDLabel:
-                text: "Star Tracker Device Settings"
-                size_hint_y: 0.1
-                halign:"center"
+        TitleLabel:
+            text: "Star Tracker Device Settings"
         BoxLayout:
             id: labels_box
             orientation: 'vertical'
@@ -465,13 +477,9 @@
 
     BoxLayout:
         orientation: 'vertical'
-        BoxLayout:
-            size_hint_y: 0.1
-            orientation: 'horizontal'
-            MDLabel:
-                text: "Star Tracker Settings"
-                size_hint_y: 0.1
-                halign:"center"
+
+        TitleLabel:
+            text: "Star Tracker Settings"
             MDIconButton:
                 # Credits
                 size_hint_x: 0.1
