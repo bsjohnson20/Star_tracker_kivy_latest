@@ -152,9 +152,15 @@ class DeviceSettings(
             print("beforebefore")
             # new name error, not here? Then? Where?
             self.dev_name, self.desc, self.ip = new_name, new_desc, new_ip
+            old_name = self.manager.get_screen('ScreenIOTControl').ids['name'].text
             self.manager.get_screen('ScreenIOTControl').ids['name'].text = new_name
             self.manager.get_screen('ScreenIOTControl').ids['desc'].text = new_desc
             self.manager.get_screen('ScreenIOTControl').ids['ip'].text = new_ip
+            # delete old key in device_storage
+            devices_storage.delete(old_name)
+            # add new key in device_storage
+            devices_storage.put(new_name, ip=new_ip, desc=new_desc)
+
             # swap to IOT_screen
             self.manager.current = "ScreenIOTControl"
 
