@@ -85,7 +85,7 @@
         orientation: "vertical"
         MDLabel:
             font_size: self.height * 0.5
-            text: "Theme Saved!"
+            text: "Theme Saved!\n Restart the app to load changes"
             halign: "center"
         MDRaisedButton:
             text: "OK"
@@ -183,8 +183,8 @@
             text: "Star Tracker Add Device"
         StackLayout:
             id: addDevice_grid
-            padding: 20
-            spacing: 20
+            padding: dp(20)
+            spacing: dp(20)
             MDTextField:
                 hint_text: "Name"
                 helper_text: "Enter a name for the device"
@@ -264,7 +264,7 @@
                 halign:"center"
             # Cards go here - build a generator for them...
             ScrollView:
-                scroll_distance: 100
+                scroll_distance: dp(20)
                 size_hint_x: 1
 
                 MDStackLayout:
@@ -420,8 +420,8 @@
             BoxLayout:
                 orientation: 'vertical'
                 id: deviceSettings_grid
-                padding: 20
-                spacing: 20
+                padding: dp(20)
+                spacing: dp(20)
                 cols: 2
 
                 MDTextField:
