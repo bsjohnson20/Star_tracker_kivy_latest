@@ -7,7 +7,7 @@ from kivy.core.window import Window  # Windows 12, the best windows
 from kivy.graphics import Color, Rectangle, Canvas
 from kivy.metrics import \
     dp  # density pixels, used for scaling, 1 dp = 1 pixel on a 160 dpi screen, 2 pixels on a 320 dpi screen, 4 pixels on a 640 dpi screen, and so on. Unfortunatly, this is not the case for all devices, so you have to use the kivy.metrics module to get the correct scaling. cry
-from kivy.properties import ObjectProperty
+from kivy.properties import ObjectProperty, BooleanProperty, ListProperty
 from kivy.properties import StringProperty  # string property, used for storing strings
 from kivy.storage.jsonstore import JsonStore  # use for storing data
 from kivy.uix.behaviors import ButtonBehavior
@@ -19,6 +19,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
+from kivy.utils import rgba
 from kivymd.app import MDApp
 from kivymd.uix.button import MDIconButton, MDRectangleFlatButton
 from kivymd.uix.card import MDCard, MDCardSwipe
@@ -45,13 +46,24 @@ Config.set('graphics', 'resizable', '1')
 print('Started program')
 
 
+class TitleLabel(BoxLayout):
+    text = StringProperty("")
+    color = ListProperty([1, 0, 0.5, 1])
+
+
+class DeviceDataPage(Widget): # inputs for device data. Standardised to cause less confusion. Actually, it causes more confusion. Just kidding, it causes even more confusion.
+    pass
+
+
 class ScreenWelcome(Screen):
     def generateScreen(self):
         pass
 
 
 class ScreenAboutMe(Screen):  # What about me?
-    pass
+    def open_dialog(self):
+        # open popup telling user they have saved their theme successfully
+        popup("You have successfully saved your theme!", "")
 
 
 class IOT_toolbar(BoxLayout):  # toolbar, used for making the toolbar. Make it explode! OR the stakeholder will explode!
@@ -98,9 +110,10 @@ class IOT_toolbar(BoxLayout):  # toolbar, used for making the toolbar. Make it e
 # DeviceSettings page
 class DeviceSettings(
     Screen):  # settings, used making settings, and having too many settings, and making the user explode because they have too many settings.
-    dev_name = StringProperty("Test")
-    ip = StringProperty("3243242")
-    desc = StringProperty("32432423324324")
+    dev_name = StringProperty("")
+    ip = StringProperty("")
+    desc = StringProperty("")
+    dev_type = StringProperty("")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -146,9 +159,18 @@ class DeviceSettings(
             print("beforebefore")
             # new name error, not here? Then? Where?
             self.dev_name, self.desc, self.ip = new_name, new_desc, new_ip
+            old_name = self.manager.get_screen('ScreenIOTControl').ids['name'].text
             self.manager.get_screen('ScreenIOTControl').ids['name'].text = new_name
             self.manager.get_screen('ScreenIOTControl').ids['desc'].text = new_desc
             self.manager.get_screen('ScreenIOTControl').ids['ip'].text = new_ip
+            self.dev_type = self.manager.get_screen('ScreenIOTControl').ids['dev_type'].text
+
+
+            # delete old key in device_storage
+            devices_storage.delete(old_name)
+            # add new key in device_storage
+            devices_storage.put(new_name, ip=new_ip, desc=new_desc,device_type=self.dev_type)
+
             # swap to IOT_screen
             self.manager.current = "ScreenIOTControl"
 
@@ -322,7 +344,8 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
 
         # add controls to box
         controls_box.add_widget(
-            forw)  # Forward and backwards just like a boat, but not a boat, a car. The air is filled with the sound of the car, and the car is filled with the sound of the air. The AI is dope.
+            forw)  # Forward and backwards just like a boat, but not a boat, a car. The air is filled with the sound
+        # of the car, and the car is filled with the sound of the air. The AI is dope.
         controls_box.add_widget(stop)
         controls_box.add_widget(backw)
 
@@ -393,7 +416,8 @@ while True:
 
 
 class ScreenAddDevice(
-    Screen):  # here we add a device, and we do it in a way that is so confusing, that the user will rage quit and never come back. I am a genius.
+    Screen):  # here we add a device, and we do it in a way that is so confusing, that the user will rage quit and
+    # never come back. I am a genius.
     def __init__(self, **kwargs):
 
         super().__init__(**kwargs)
@@ -431,7 +455,8 @@ class ScreenAddDevice(
         dropdown_opener.bind(on_release=lambda a: dropdown.open())
 
     def Validate(self, *args,
-                 **kwargs):  # don't you dare touch this code, it is perfect, and it works, and it is the best code ever written. I am a genius.
+                 **kwargs):  # don't you dare touch this code, it is perfect, and it works, and it is the best code
+        # ever written. I am a genius.
         # so much validation :(
 
         temp = App.get_running_app().root.ids.screen_Add_id.ids
@@ -441,7 +466,7 @@ class ScreenAddDevice(
         # check if dev type is not unselcted
         # check if ip is valid
         # check if name is already in dict
-        if not ValidatingTool.empty_data(self, temp.dev_name.text, temp.ip_id.text, temp.desc.text):
+        if not ValidatingTool.empty_data(self, temp.dev_name.text, temp.ip_id.text, temp.description.text):
             popup("Please fill in all fields")
         elif not ValidatingTool.checkDevType(self, temp.dropdown_opener.text):
             popup("Please select a device type")
@@ -451,7 +476,7 @@ class ScreenAddDevice(
             popup("Name already in use")
         else:
             # add to dict
-            devices_storage.put(temp.dev_name.text, desc=temp.desc.text, ip=temp.ip_id.text,
+            devices_storage.put(temp.dev_name.text, desc=temp.description.text, ip=temp.ip_id.text,
                                 device_type=temp.dropdown_opener.text)
             App.get_running_app().root.current = "ScreenHome"
             App.get_running_app().root.ids.screen_Home_id.setup()
@@ -529,7 +554,7 @@ class ScreenHome(Screen):
             self.parent.item = item
 
             # create THE Box this'll contain labels and the buton to open the corresponding IOT panel
-            Box = DeviceCard(dev_name=item, ip=devices_storage[item]['ip'], desc=devices_storage[item]['desc'], device=devices_storage[item]['device_type'], size_hint_y=None)
+            Box = DeviceCard(dev_name=item, ip=devices_storage[item]['ip'], desc=devices_storage[item]['desc'], device=devices_storage[item]['device_type'])
             # add color to Box
             # make it pretty
             # it didn't work :(, I wish It did. Then I could be a genius.
@@ -605,25 +630,16 @@ class ToolBar(BoxLayout):
         # set orientation to horizontal
         self.orientation = 'horizontal'
         # Canvas
-        with self.canvas.before:
-            # set color to purple
-            Color(0.5, 0, 0.5, 1)
-            # draw a rectangle
-            self.rect = Rectangle(size=self.size, pos=self.pos)
+        print(f"ids: {self.ids}")
+        add_to = self
         # bind size and position to update rectangle
-        self.bind(size=self.update_rect, pos=self.update_rect)
-        self.add_widget(AddButton())
-        self.add_widget(HomeButton())
-        self.add_widget(MeButton())
-        # set background color to purple
-        self.background_color = (0.5, 0, 0.5, 1)
+
+
         # update size on window resize
         # add padding to half the width of root screen
 
     # function to update size on resize
-    def update_rect(self, *args):
-        self.rect.pos = self.pos
-        self.rect.size = self.size
+
 
     # function to update size on resize
 
@@ -688,6 +704,7 @@ class MeButton(MDIconButton):  # This is me, I am that button. I am a genius.
 
 class LunaApp(
     MDApp):  # here we have the main app class, it is the main class, and it is not a class, it is a god. I am a genius.
+    allowThemeSaving = BooleanProperty()
     def __init__(self, nursery, **kwargs):
         super().__init__(**kwargs)
         self.nursery = nursery
@@ -697,6 +714,15 @@ class LunaApp(
         self.theme_cls.accent_palette = "Purple"
         self.theme_cls.primary_hue = "A700"
         self.theme_cls.accent_hue = "A700"
+        self.theme_primary = [0.5, 0, 0.5, 1]
+        self.allowThemeSaving = False
+        try:
+            self.theme_primary=settings_storage.get('theme')['args']
+            print(self.theme_primary)
+        except KeyError:
+            # save default theme
+            settings_storage.put('theme', args=self.theme_primary)
+
 
     def build(self):  # this is the build method, it builds the app, and it does it well. I am a genius.
         """This method returns the Manager class"""
@@ -732,15 +758,20 @@ class LunaApp(
         self.root.current = 'Screen2'
         """
 
-    def LightMode(self):  # doesn't work, but I am a genius.
-        App.get_running_app().theme_cls.theme_style = "Light"
-        # change buttons to red
-        App.get_running_app().primary_palette = "Red"
 
-    def DarkMode(self):  # Doesn't do anything, but I am a genius.
-        App.get_running_app().theme_cls.theme_style = "Dark"
-        # change buttons to red
-        App.get_running_app().theme_cls.primary_palette = "Purple"
+
+    # set color
+    def set_color(self, color, *args):
+        if self.allowThemeSaving:
+            print(f"Setting color to {color}, args are {args}")
+            self.theme_primary = args
+
+            # save theme setting to settings.json
+            settings_storage.put('theme', args=args[0])
+        else: # we shouldn't be saving the theme yet
+            print("Attempted to save theme, but not allowed to save theme yet")
+
+
 
 
 class ScreenCredits(Screen):  # I am the absolute best, I am a god, and I am a genius.
