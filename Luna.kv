@@ -2,7 +2,7 @@
 ##:include screenone.kv
 ##:include screentwo.kv
 ##:include screenwelcome.kv
-
+#:import F kivy.factory.Factory
 # Use the above to import screen files
 
 #<ContextButton@Button>:
@@ -50,6 +50,18 @@
     ScreenCredits:
         id: screen_credits_id
         name: "ScreenCredits"
+<SavedTheme@Popup>:
+    title: "Saved Theme"
+    size_hint: 0.5, 0.5
+    auto_dismiss: True
+    BoxLayout:
+        orientation: "vertical"
+        MDLabel:
+            text: "Theme Saved!"
+            halign: "center"
+        MDRaisedButton:
+            text: "OK"
+            on_release: root.dismiss()
 
 <DeviceDataPage>:
     BoxLayout:
@@ -83,7 +95,7 @@
         Color:
             # make it purple
             # use app theme
-            rgba: app.theme_cls.primary_color
+            rgba: app.theme_primary
 
         Rectangle:
             pos: self.pos
@@ -102,7 +114,7 @@
 
         MDTextButton:
             text: 'Welcome to the\n Star Tracker IOT APP'
-            size_hint_y: 0.9
+            size_hint_y: 1
             size_hint_x: 1
             halign:"center"
             on_release:
@@ -113,6 +125,11 @@
             size_hint_y: 0.1
             text: "Continue!"
             size_hint_x: 1
+            md_bg_color: app.theme_primary
+
+            # set color to app theme
+
+
             on_press:
 
                 root.manager.current = root.manager.splash_next
@@ -175,7 +192,7 @@
                 Color:
                     # make it purple
                     # use app theme
-                    rgba: app.theme_cls.primary_color
+                    rgba: app.theme_primary
 
                 Rectangle:
                     pos: self.pos
@@ -232,7 +249,6 @@
 # template for the cards :D - on the way to launch!
 <DeviceCard>:
     size_hint_y: None
-    size_hint_x: 0.2
     MDCardSwipeLayerBox:
         # delete me
         Deletethis:
@@ -250,6 +266,7 @@
 
         OneLineListItem:
             size_hint_y: 1
+
             id: card_name
             on_release:
                 print("card name pressed")
@@ -302,7 +319,7 @@
             canvas:
                 Color:
                     # make it purple
-                    rgba: app.theme_cls.primary_color
+                    rgba: app.theme_primary
                 Rectangle:
                     pos: self.pos
                     size: self.size
@@ -416,7 +433,7 @@
             canvas:
                 Color:
                     # make it purple
-                    rgba: app.theme_cls.primary_color
+                    rgba: app.theme_primary
                 Rectangle:
                     pos: self.pos
                     size: self.size
@@ -439,6 +456,12 @@
 
 
 <ScreenAboutMe>:
+    on_enter:
+        app.get_running_app().allowThemeSaving = True # Prevent theme saving on first load. This is to prevent the theme from being saved before the user has changed it.
+
+    on_leave:
+        app.get_running_app().allowThemeSaving = False # Prevent theme saving after we have left.
+
     BoxLayout:
         orientation: 'vertical'
         BoxLayout:
@@ -465,24 +488,14 @@
                 size_hint_y: 0.1
                 halign:"center"
             # set app theme
-            MDRectangleFlatButton:
-                text: "Light"
-                id: dropdown_opener
-                size_hint_x: 1
+
+                    # colour picker
+            ColorPicker:
+                id: color_picker
                 size_hint_y: 0.8
-                # set theme on release
-                on_release:
-                    # call LightMode
-                    app.get_running_app().LightMode()
-            MDRectangleFlatButton:
-                text: "Dark"
-                id: dropdown_opener
                 size_hint_x: 1
-                size_hint_y: 0.8
-                # set theme on release
-                on_release:
-                    # call DarkMode
-                    app.get_running_app().DarkMode()
+                on_color: app.get_running_app().set_color(*args)
+
 
 
 
@@ -493,7 +506,7 @@
             canvas:
                 Color:
                     # make it purple
-                    rgba: app.theme_cls.primary_color
+                    rgba: app.theme_primary
                 Rectangle:
                     pos: self.pos
                     size: self.size
@@ -509,9 +522,12 @@
                 size_hint_x: 1
                 text: "Save"
                 on_press:
+                    root.open_dialog()
                     root.manager.current = root.manager.last_screen
                     root.manager.last_screen = "ScreenAboutMe"
+
                 icon: "content-save"
+
 
 
 

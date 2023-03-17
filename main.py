@@ -7,7 +7,7 @@ from kivy.core.window import Window  # Windows 12, the best windows
 from kivy.graphics import Color, Rectangle, Canvas
 from kivy.metrics import \
     dp  # density pixels, used for scaling, 1 dp = 1 pixel on a 160 dpi screen, 2 pixels on a 320 dpi screen, 4 pixels on a 640 dpi screen, and so on. Unfortunatly, this is not the case for all devices, so you have to use the kivy.metrics module to get the correct scaling. cry
-from kivy.properties import ObjectProperty
+from kivy.properties import ObjectProperty, BooleanProperty
 from kivy.properties import StringProperty  # string property, used for storing strings
 from kivy.storage.jsonstore import JsonStore  # use for storing data
 from kivy.uix.behaviors import ButtonBehavior
@@ -55,7 +55,9 @@ class ScreenWelcome(Screen):
 
 
 class ScreenAboutMe(Screen):  # What about me?
-    pass
+    def open_dialog(self):
+        # open popup telling user they have saved their theme successfully
+        popup("You have successfully saved your theme!", "")
 
 
 class IOT_toolbar(BoxLayout):  # toolbar, used for making the toolbar. Make it explode! OR the stakeholder will explode!
@@ -326,7 +328,8 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
 
         # add controls to box
         controls_box.add_widget(
-            forw)  # Forward and backwards just like a boat, but not a boat, a car. The air is filled with the sound of the car, and the car is filled with the sound of the air. The AI is dope.
+            forw)  # Forward and backwards just like a boat, but not a boat, a car. The air is filled with the sound
+        # of the car, and the car is filled with the sound of the air. The AI is dope.
         controls_box.add_widget(stop)
         controls_box.add_widget(backw)
 
@@ -397,7 +400,8 @@ while True:
 
 
 class ScreenAddDevice(
-    Screen):  # here we add a device, and we do it in a way that is so confusing, that the user will rage quit and never come back. I am a genius.
+    Screen):  # here we add a device, and we do it in a way that is so confusing, that the user will rage quit and
+    # never come back. I am a genius.
     def __init__(self, **kwargs):
 
         super().__init__(**kwargs)
@@ -435,7 +439,8 @@ class ScreenAddDevice(
         dropdown_opener.bind(on_release=lambda a: dropdown.open())
 
     def Validate(self, *args,
-                 **kwargs):  # don't you dare touch this code, it is perfect, and it works, and it is the best code ever written. I am a genius.
+                 **kwargs):  # don't you dare touch this code, it is perfect, and it works, and it is the best code
+        # ever written. I am a genius.
         # so much validation :(
 
         temp = App.get_running_app().root.ids.screen_Add_id.ids
@@ -683,6 +688,7 @@ class MeButton(MDIconButton):  # This is me, I am that button. I am a genius.
 
 class LunaApp(
     MDApp):  # here we have the main app class, it is the main class, and it is not a class, it is a god. I am a genius.
+    allowThemeSaving = BooleanProperty()
     def __init__(self, nursery, **kwargs):
         super().__init__(**kwargs)
         self.nursery = nursery
@@ -692,6 +698,15 @@ class LunaApp(
         self.theme_cls.accent_palette = "Purple"
         self.theme_cls.primary_hue = "A700"
         self.theme_cls.accent_hue = "A700"
+        self.theme_primary = [0.5, 0, 0.5, 1]
+        self.allowThemeSaving = False
+        try:
+            self.theme_primary=settings_storage.get('theme')['args']
+            print(self.theme_primary)
+        except KeyError:
+            # save default theme
+            settings_storage.put('theme', args=self.theme_primary)
+
 
     def build(self):  # this is the build method, it builds the app, and it does it well. I am a genius.
         """This method returns the Manager class"""
@@ -727,15 +742,20 @@ class LunaApp(
         self.root.current = 'Screen2'
         """
 
-    def LightMode(self):  # doesn't work, but I am a genius.
-        App.get_running_app().theme_cls.theme_style = "Light"
-        # change buttons to red
-        App.get_running_app().primary_palette = "Red"
 
-    def DarkMode(self):  # Doesn't do anything, but I am a genius.
-        App.get_running_app().theme_cls.theme_style = "Dark"
-        # change buttons to red
-        App.get_running_app().theme_cls.primary_palette = "Purple"
+
+    # set color
+    def set_color(self, color, *args):
+        if self.allowThemeSaving:
+            print(f"Setting color to {color}, args are {args}")
+            self.theme_primary = args
+
+            # save theme setting to settings.json
+            settings_storage.put('theme', args=args[0])
+        else: # we shouldn't be saving the theme yet
+            print("Attempted to save theme, but not allowed to save theme yet")
+
+
 
 
 class ScreenCredits(Screen):  # I am the absolute best, I am a god, and I am a genius.
