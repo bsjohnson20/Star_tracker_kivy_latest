@@ -65,6 +65,7 @@
             size: self.size
     MDLabel:
         theme_text_color: "Custom"
+        font_size: self.height * 0.5
         text: root.text
         # text_colour should be the inverted theme colour
         text_color: 1-app.theme_primary[0], 1-app.theme_primary[1], 1-app.theme_primary[2], 1
@@ -83,6 +84,7 @@
     BoxLayout:
         orientation: "vertical"
         MDLabel:
+            font_size: self.height * 0.5
             text: "Theme Saved!"
             halign: "center"
         MDRaisedButton:
@@ -138,14 +140,20 @@
     BoxLayout:
         orientation: 'vertical'
 
+
         MDTextButton:
             text: 'Welcome to the\n Star Tracker IOT APP'
-            size_hint_y: 1
+            size_hint_y: 0.2
             size_hint_x: 1
             halign:"center"
+            # resize text to fit button
+            font_size: self.height * 0.5
             on_release:
                 root.manager.current = root.manager.splash_next
                 root.manager.last_screen = 'ScreenWelcome'
+        AsyncImage:
+            # source is Princess_Luna_Remul-Lemlem_personaluse_fairuse.png
+            source: "Princess_Luna_Remul-Lemlem_personaluse_fairuse.png"
         MDRaisedButton:
             halign: 'center'
             size_hint_y: 0.1
@@ -303,6 +311,7 @@
                     halign: "center"
                     size_hint_x: 0.9
                     size_hint_y: 1
+                    font_size: self.height * 0.5
                 MDIcon:
                     pos_hint: {"center_x": .5, "center_y": .5}
                     icon: "lightbulb-on"
@@ -363,8 +372,9 @@
             halign:"center"
         MDLabel:
             size_hint_y: 0.1
+            font_size: self.height * 0.4
             halign:"center"
-            text: "This is an app created for my coursework, and I have enjoyed it's development watching my skills improve.\n The below image is by Remul-Lemlem on devianArt I do not claim ownership of it."
+            text: "This is an app created for my coursework, and I have enjoyed it's development watching my skills improve The below image is by Remul-Lemlem on devianArt I do not claim ownership of it."
         AsyncImage:
             # load image from website
             source: "Princess_Luna_Remul-Lemlem_personaluse_fairuse.png"
