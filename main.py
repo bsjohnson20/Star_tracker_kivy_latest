@@ -1,3 +1,6 @@
+# version 1.0.0
+
+
 import os
 import threading  # look at how many threads are running, if too many, just add more. Make user explode.
 import trio
