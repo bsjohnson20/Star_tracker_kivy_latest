@@ -1,0 +1,546 @@
+##:kivy 1.10.0
+##:include screenone.kv
+##:include screentwo.kv
+##:include screenwelcome.kv
+#:import F kivy.factory.Factory
+# Use the above to import screen files
+
+#<ContextButton@Button>:
+ #   size: 120, 40
+# say hello
+
+
+
+<Manager>:
+    id: fuckeroni
+    screenwelcome: screen_welcome_id
+    screenadddevice: screen_Add_id
+    screenhome: screen_Home_id
+    screenaboutme: screen_AboutMe_id
+    screeniotcontrol: screen_IOTControl_id
+    screencredits: screen_credits_id
+
+
+# The order below determines which screen is displayed after app loads
+
+
+    ScreenWelcome:
+        id: screen_welcome_id
+        name: 'ScreenWelcome'
+
+    ScreenAddDevice:
+        id: screen_Add_id
+        name: 'ScreenAdd'
+
+    ScreenHome:
+        id: screen_Home_id
+        name: "ScreenHome"
+
+    ScreenAboutMe:
+        id: screen_AboutMe_id
+        name: "ScreenAboutMe"
+
+    ScreenIOTControl:
+        id: screen_IOTControl_id
+        name: "ScreenIOTControl"
+
+    DeviceSettings:
+        id: device_settings_id
+        name: "DeviceSettings"
+    ScreenCredits:
+        id: screen_credits_id
+        name: "ScreenCredits"
+
+<TitleLabel>:
+    size_hint: 1, 0.1
+    orientation: "vertical"
+    canvas:
+        Color:
+            # make it purple
+            # use app theme
+            rgba: app.theme_primary
+
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    MDLabel:
+        theme_text_color: "Custom"
+        font_size: self.height * 0.5
+        text: root.text
+        # text_colour should be the inverted theme colour
+        text_color: 1-app.theme_primary[0], 1-app.theme_primary[1], 1-app.theme_primary[2], 1
+        font_size: self.height * 0.5
+        halign: "center"
+        valign: "middle"
+        size_hint_y: 0.1
+        size_hint_x: 1
+
+
+
+<SavedTheme@Popup>:
+    title: "Saved Theme"
+    size_hint: 0.5, 0.5
+    auto_dismiss: True
+    BoxLayout:
+        orientation: "vertical"
+        MDLabel:
+            font_size: self.height * 0.5
+            text: "Theme Saved!\n Restart the app to load changes"
+            halign: "center"
+        MDRaisedButton:
+            text: "OK"
+            on_release: root.dismiss()
+
+<DeviceDataPage>:
+    BoxLayout:
+        MDTextField:
+            hint_text: "Name"
+            helper_text: "Enter a name for the device"
+            helper_text_mode: "on_focus"
+            multiline: False
+            id: dev_name
+            font_size: self.height * 0.5
+
+        MDTextField:
+            hint_text: "Description"
+            helper_text: "Enter a description for the device"
+            helper_text_mode: "on_focus"
+            multiline: False
+            id: description
+            font_size: self.height * 0.5
+        MDTextField:
+            hint_text: "IP Address"
+            helper_text: "Enter a valid IP address in the format x.x.x.x"
+            helper_text_mode: "on_focus"
+            id: ip_id
+            multiline: False
+            font_size: self.height * 0.5
+
+
+<Toolbar>:
+    # make back canvas
+    canvas:
+        Color:
+            # make it purple
+            # use app theme
+            rgba: app.theme_primary
+
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    AddButton:
+        size_hint_x: 1
+    HomeButton:
+        size_hint_x: 1
+    MeButton:
+        size_hint_x: 1
+
+
+<ScreenWelcome>:
+    BoxLayout:
+        orientation: 'vertical'
+
+
+        MDTextButton:
+            text: 'Welcome to the\n Star Tracker IOT APP'
+            size_hint_y: 0.2
+            size_hint_x: 1
+            halign:"center"
+            # resize text to fit button
+            font_size: self.height * 0.5
+            on_release:
+                root.manager.current = root.manager.splash_next
+                root.manager.last_screen = 'ScreenWelcome'
+        AsyncImage:
+            # source is Princess_Luna_Remul-Lemlem_personaluse_fairuse.png
+            source: "Princess_Luna_Remul-Lemlem_personaluse_fairuse.png"
+        MDRaisedButton:
+            halign: 'center'
+            size_hint_y: 0.1
+            text: "Continue!"
+            size_hint_x: 1
+            md_bg_color: app.theme_primary
+
+            # set color to app theme
+
+
+            on_press:
+
+                root.manager.current = root.manager.splash_next
+                root.manager.last_screen = 'ScreenWelcome'
+
+            pos_hint: {"center_x": .5, "center_y": .5}
+
+
+
+<ScreenAddDevice>:
+
+    id: devices
+    BoxLayout:
+
+        orientation: 'vertical'
+        TitleLabel:
+            text: "Star Tracker Add Device"
+        StackLayout:
+            id: addDevice_grid
+            padding: dp(20)
+            spacing: dp(20)
+            MDTextField:
+                hint_text: "Name"
+                helper_text: "Enter a name for the device"
+                helper_text_mode: "on_focus"
+                multiline: False
+                id: dev_name
+                font_size: self.height * 0.5
+
+            MDTextField:
+                hint_text: "Description"
+                helper_text: "Enter a description for the device"
+                helper_text_mode: "on_focus"
+                multiline: False
+                id: description
+                font_size: self.height * 0.5
+            MDTextField:
+                hint_text: "IP Address"
+                helper_text: "Enter a valid IP address in the format x.x.x.x"
+                helper_text_mode: "on_focus"
+                id: ip_id
+                multiline: False
+                font_size: self.height * 0.5
+            MDRectangleFlatButton:
+                text: "Device Types"
+                id: dropdown_opener
+                size_hint_x: 1
+                size_hint_y: 0.2
+
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: 0.1
+
+            canvas:
+                Color:
+                    # make it purple
+                    # use app theme
+                    rgba: app.theme_primary
+
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            MDIconButton:
+                size_hint_x: 1
+                text: "Back"
+                on_press:
+                    root.manager.current = root.manager.last_screen
+                    root.manager.last_screen = "ScreenAdd"
+                icon: "arrow-left"
+
+
+            MDIconButton:
+                size_hint_x: 1
+                text: "Continue"
+                on_press:
+                    root.Validate()
+                    # self.Validate()
+                icon: "checkbox-marked-circle"
+
+
+
+
+<ScreenHome>:
+    BoxLayout:
+        size_hint_x: 1
+        id: screenhome_box
+        orientation: "vertical"
+        BoxLayout:
+
+            id: homeScreen_HomeHome
+            size_hint_y:0.9
+            orientation: 'vertical'
+
+            # call TitleLabel class and set text to "Home"
+            TitleLabel:
+                text: "Home"
+                halign:"center"
+            # Cards go here - build a generator for them...
+            ScrollView:
+                scroll_distance: dp(20)
+                size_hint_x: 1
+
+                MDStackLayout:
+                    size_hint_y:None
+                    height: self.minimum_height
+                    # 10 pixels in dp for spacing
+                    spacing: dp(10)
+                    id: add_here
+            ToolBar:
+                size_hint_y: 0.1
+
+# template for the cards :D - on the way to launch!
+<DeviceCard>:
+    size_hint_y: None
+    MDCardSwipeLayerBox:
+        # delete me
+        Deletethis:
+            on_release:
+                self.removeFromDatabase(root.dev_name)
+                root.parent.remove_widget(root)
+                # update the database
+
+    MDCardSwipeFrontBox:
+        size_hint_y: 1
+        # on release
+        # show the dev_name of the card
+        on_release:
+            root.open()
+
+        OneLineListItem:
+            size_hint_y: 1
+
+            id: card_name
+            on_release:
+                print("card name pressed")
+                root.open()
+        # show name of root.name
+            BoxLayout:
+                orientation: "horizontal"
+                # center
+
+                MDLabel:
+                    text: root.dev_name+"\n"+root.ip # simplify it
+                    halign: "center"
+                    size_hint_x: 0.9
+                    size_hint_y: 1
+                    font_size: self.height * 0.5
+                MDIcon:
+                    pos_hint: {"center_x": .5, "center_y": .5}
+                    icon: "lightbulb-on"
+                    halign: "center"
+                    size_hint_x: 0.1
+                    # set size to change with the screen
+                    size: self.texture_size
+                    # set the size of the icon to be the same as the text
+                    font_size: self.height * 1
+
+
+
+
+<ScreenIOTControl>:
+    BoxLayout:
+        # min size of the box
+        # centre the box
+        pos_hint: {"center_x": .5, "center_y": .5}
+
+        orientation: 'vertical'
+        TitleLabel:
+            text: "Star Tracker IOT Control"
+            halign:"center"
+        BoxLayout:
+            id: iotcontrol_box
+            orientation: 'vertical'
+            size_hint_y: 0.9
+            # pos hint is relative to the parent widget
+            pos_hint: {"center_x": .5, "center_y": .5}
+
+        BoxLayout:
+            size_hint_y: 0.1
+            size_hint_x: 1
+            id: toolbar_box
+            canvas:
+                Color:
+                    # make it purple
+                    rgba: app.theme_primary
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            # scale toolbar to 10% of screen height
+            IOT_toolbar:
+                # set name, desc and ip
+                dev_name: root.dev_name
+                desc: root.desc
+                ip: root.ip
+
+
+
+
+            # scale x to 100% of screen width
+<ScreenCredits>:
+    BoxLayout:
+        orientation: 'vertical'
+        TitleLabel:
+            text: "Star Tracker Credits"
+            halign:"center"
+        MDLabel:
+            size_hint_y: 0.1
+            font_size: self.height * 0.4
+            halign:"center"
+            text: "This is an app created for my coursework, and I have enjoyed it's development watching my skills improve The below image is by Remul-Lemlem on devianArt I do not claim ownership of it."
+        AsyncImage:
+            # load image from website
+            source: "Princess_Luna_Remul-Lemlem_personaluse_fairuse.png"
+            size_hint_y: 0.9
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: 0.1
+            MDIconButton:
+                size_hint_x: 1
+                text: "Back"
+                on_release:
+                    root.manager.current = root.manager.last_screen
+                    root.manager.last_screen = "ScreenHome"
+                icon: "arrow-left"
+
+
+
+<DeviceSettings>:
+
+
+
+    on_enter:
+        print(root.manager.dev_name)
+        self.dev_name = root.manager.dev_name
+        self.desc = root.manager.desc
+        self.ip = root.manager.ip
+
+        # update the text inputs
+        self.ids.nameInput.text = root.manager.dev_name
+        self.ids.descInput.text = root.manager.desc
+        self.ids.ipInput.text = root.manager.ip
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        TitleLabel:
+            text: "Star Tracker Device Settings"
+        BoxLayout:
+            id: labels_box
+            orientation: 'vertical'
+            size_hint_y: 0.9
+            # name, desc and IP labels
+            BoxLayout:
+                orientation: 'vertical'
+                id: deviceSettings_grid
+                padding: dp(20)
+                spacing: dp(20)
+                cols: 2
+
+                MDTextField:
+                    hint_text: "Name"
+                    helper_text: "Enter a name for the device"
+                    helper_text_mode: "on_focus"
+
+                    id: nameInput
+                    text: root.dev_name
+                MDTextField:
+                    hint_text: "Description"
+                    helper_text: "Enter a description for the device"
+                    helper_text_mode: "on_focus"
+                    multiline: False
+                    id: descInput
+                    text: root.desc
+                MDTextField:
+                    hint_text: "Description"
+                    helper_text: "Enter a description for the device"
+                    helper_text_mode: "on_focus"
+                    multiline: False
+                    id: ipInput
+                    text: root.ip
+
+
+
+        BoxLayout: # toolbar
+            orientation: 'horizontal'
+            size_hint_y: 0.1
+            # theme
+            canvas:
+                Color:
+                    # make it purple
+                    rgba: app.theme_primary
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            MDIconButton:
+                size_hint_x: 1
+                text: "Back"
+                on_release:
+
+                    root.manager.current = "ScreenIOTControl"
+                    root.manager.last_screen = "DeviceSettings"
+                icon: "arrow-left"
+            # Save button
+            MDIconButton:
+                size_hint_x: 1
+                text: "Save"
+                icon: "content-save"
+                on_release:
+                    # fetch ids for text inputs
+                    root.save(dev_name=self.parent.parent.parent.ids.nameInput.text, desc=self.parent.parent.parent.ids.descInput.text, ip=self.parent.parent.parent.ids.ipInput.text)
+                    print(app.root.ids.screen_Home_id.setup())
+
+
+<ScreenAboutMe>:
+    on_enter:
+        app.get_running_app().allowThemeSaving = True # Prevent theme saving on first load. This is to prevent the theme from being saved before the user has changed it.
+
+    on_leave:
+        app.get_running_app().allowThemeSaving = False # Prevent theme saving after we have left.
+
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint_y: 0.1
+            TitleLabel:
+                text: "Star Tracker Settings"
+                size_hint: 1, 1
+            MDIconButton:
+                # Credits
+                size_hint_x: 0.1
+                size_hint_y: 1
+                icon: "information"
+                on_release:
+                    root.manager.current = "ScreenCredits"
+                    root.manager.last_screen = "ScreenAboutMe"
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y: 0.9
+            ColorPicker:
+                id: color_picker
+                size_hint_y: 0.8
+                size_hint_x: 1
+                on_color: app.get_running_app().set_color(*args)
+
+
+
+
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: 0.1
+            canvas:
+                Color:
+                    # make it purple
+                    rgba: app.theme_primary
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            MDIconButton:
+                size_hint_x: 1
+                text: "Back"
+                on_press:
+                    root.manager.current = root.manager.last_screen
+                    root.manager.last_screen = "ScreenAboutMe"
+                icon: "arrow-left"
+
+            MDIconButton:
+                size_hint_x: 1
+                text: "Save"
+                on_press:
+                    root.open_dialog()
+                    root.manager.current = root.manager.last_screen
+                    root.manager.last_screen = "ScreenAboutMe"
+
+                icon: "content-save"
+
+
+
+
