@@ -279,8 +279,10 @@
 
 # template for the cards :D - on the way to launch!
 <DeviceCard>:
-    size_hint_y: None
+    size: 1, dp(150)
+    adaptive_size: True
     MDCardSwipeLayerBox:
+        size: self.parent.size
         # delete me
         Deletethis:
             on_release:
