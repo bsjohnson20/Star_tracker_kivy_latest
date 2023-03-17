@@ -104,9 +104,10 @@ class IOT_toolbar(BoxLayout):  # toolbar, used for making the toolbar. Make it e
 # DeviceSettings page
 class DeviceSettings(
     Screen):  # settings, used making settings, and having too many settings, and making the user explode because they have too many settings.
-    dev_name = StringProperty("Test")
-    ip = StringProperty("3243242")
-    desc = StringProperty("32432423324324")
+    dev_name = StringProperty("")
+    ip = StringProperty("")
+    desc = StringProperty("")
+    dev_type = StringProperty("")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -156,10 +157,13 @@ class DeviceSettings(
             self.manager.get_screen('ScreenIOTControl').ids['name'].text = new_name
             self.manager.get_screen('ScreenIOTControl').ids['desc'].text = new_desc
             self.manager.get_screen('ScreenIOTControl').ids['ip'].text = new_ip
+            self.dev_type = self.manager.get_screen('ScreenIOTControl').ids['dev_type'].text
+
+
             # delete old key in device_storage
             devices_storage.delete(old_name)
             # add new key in device_storage
-            devices_storage.put(new_name, ip=new_ip, desc=new_desc)
+            devices_storage.put(new_name, ip=new_ip, desc=new_desc,device_type=self.dev_type)
 
             # swap to IOT_screen
             self.manager.current = "ScreenIOTControl"
