@@ -7,7 +7,7 @@ from kivy.core.window import Window  # Windows 12, the best windows
 from kivy.graphics import Color, Rectangle, Canvas
 from kivy.metrics import \
     dp  # density pixels, used for scaling, 1 dp = 1 pixel on a 160 dpi screen, 2 pixels on a 320 dpi screen, 4 pixels on a 640 dpi screen, and so on. Unfortunatly, this is not the case for all devices, so you have to use the kivy.metrics module to get the correct scaling. cry
-from kivy.properties import ObjectProperty, BooleanProperty
+from kivy.properties import ObjectProperty, BooleanProperty, ListProperty
 from kivy.properties import StringProperty  # string property, used for storing strings
 from kivy.storage.jsonstore import JsonStore  # use for storing data
 from kivy.uix.behaviors import ButtonBehavior
@@ -48,6 +48,7 @@ print('Started program')
 
 class TitleLabel(BoxLayout):
     text = StringProperty("")
+    color = ListProperty([1, 0, 0.5, 1])
 
 
 class DeviceDataPage(Widget): # inputs for device data. Standardised to cause less confusion. Actually, it causes more confusion. Just kidding, it causes even more confusion.

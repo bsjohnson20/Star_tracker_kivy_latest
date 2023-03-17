@@ -53,24 +53,27 @@
 
 <TitleLabel>:
     size_hint: 1, 0.1
-    BoxLayout:
-        orientation: "vertical"
-        MDLabel:
-            text: root.text
-            font_size: self.height * 0.5
-            halign: "center"
-            valign: "middle"
-            size_hint_y: 0.1
-            size_hint_x: 1
-            canvas:
-                Color:
-                    # make it purple
-                    # use app theme
-                    rgba: app.theme_primary
+    orientation: "vertical"
+    canvas:
+        Color:
+            # make it purple
+            # use app theme
+            rgba: app.theme_primary
 
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    MDLabel:
+        theme_text_color: "Custom"
+        text: root.text
+        # text_colour should be the inverted theme colour
+        text_color: 1-app.theme_primary[0], 1-app.theme_primary[1], 1-app.theme_primary[2], 1
+        font_size: self.height * 0.5
+        halign: "center"
+        valign: "middle"
+        size_hint_y: 0.1
+        size_hint_x: 1
+
 
 
 <SavedTheme@Popup>:
@@ -355,12 +358,9 @@
 <ScreenCredits>:
     BoxLayout:
         orientation: 'vertical'
-        BoxLayout:
-            size_hint_y: 0.1
-            orientation: 'horizontal'
-            TitleLabel:
-                text: "Star Tracker Credits"
-                halign:"center"
+        TitleLabel:
+            text: "Star Tracker Credits"
+            halign:"center"
         MDLabel:
             size_hint_y: 0.1
             halign:"center"
@@ -477,9 +477,11 @@
 
     BoxLayout:
         orientation: 'vertical'
-
-        TitleLabel:
-            text: "Star Tracker Settings"
+        BoxLayout:
+            size_hint_y: 0.1
+            TitleLabel:
+                text: "Star Tracker Settings"
+                size_hint: 1, 1
             MDIconButton:
                 # Credits
                 size_hint_x: 0.1
@@ -491,14 +493,6 @@
         BoxLayout:
             orientation: 'vertical'
             size_hint_y: 0.9
-            # Theme settings
-            MDLabel:
-                text: "Theme"
-                size_hint_y: 0.1
-                halign:"center"
-            # set app theme
-
-                    # colour picker
             ColorPicker:
                 id: color_picker
                 size_hint_y: 0.8
