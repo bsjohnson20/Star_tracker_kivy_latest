@@ -4,6 +4,7 @@
 import os
 import threading  # look at how many threads are running, if too many, just add more. Make user explode.
 import trio
+import requests
 
 from kivy.app import App  # the beloved app
 from kivy.core.window import Window  # Windows 12, the best windows
@@ -28,6 +29,7 @@ from kivymd.uix.button import MDIconButton, MDRectangleFlatButton
 from kivymd.uix.card import MDCard, MDCardSwipe
 from kivymd.uix.label import MDLabel
 from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.slider import MDSlider
 
 Label = MDLabel
 settings_storage = JsonStore('settings.json')
@@ -243,6 +245,23 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
         self.ip = ""
         self.desc = ""
 
+    def sendCommand(self, ip, command, *args, **kwargs):  # sends command to device
+        # use requests to send command to device with format http://ip:port/api?command=command+"
+        print(self.ip)
+        result = requests.get(f"http://{self.ip}/api?command={command}")
+        print(result.text)
+
+    def sendSpeed(self, ip, speed, *args, **kwargs):  # sends speed to device
+        # use requests to send command to device with format http://ip:port/api?speed=speed"
+        print(self.ip)
+        try:
+            result = requests.get(f"http://{self.ip}/api?speed={speed}")
+            print(result.text)
+        except ConnectionError:
+            print("Unable to send, as no connection!")
+        except requests.exceptions.ConnectionError:
+            print("Unable to send as no connection!")
+
     def loadPage(self, dev_name, dev_type, **kwargs):  # assembles the IOT screen and your big brain
         """
         Load the page for the device type and device dev_name with the data and controls.
@@ -338,11 +357,11 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
                                                                                                 0.5))  # control that brain of yours, and make it do what you want it to do. and actually do it, not just think about it.
         controls_box.size_hint_x = 1
         # actual
-        forw = MDRectangleFlatButton(text="forward", on_press=lambda x: print("Forward"))
+        forw = MDRectangleFlatButton(text="forward", on_press=lambda x: self.sendCommand(self.ip, "STEPFORW"))
         forw.size_hint_x = 1
-        backw = MDRectangleFlatButton(text="backward", on_press=lambda x: print("Backward"))
+        backw = MDRectangleFlatButton(text="backward", on_press=lambda x: self.sendCommand(self.ip, "STEPBACK"))
         backw.size_hint_x = 1
-        stop = MDRectangleFlatButton(text="stop", on_press=lambda x: print("Stop"))
+        stop = MDRectangleFlatButton(text="stop", on_press=lambda x: self.sendCommand(self.ip, "STEPSTOP"))
         stop.size_hint_x = 1
 
         # add controls to box
@@ -354,6 +373,46 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
 
         # add controls box to main box
         main_box.add_widget(controls_box)
+
+        # Boxlayout to add speed slider
+        speed_box = BoxLayout(orientation="horizontal", spacing=10, padding=10, size_hint=(1, 0.2))
+        speed_box.size_hint_x = 1
+
+        # add speed slider
+        speed_slider = MDSlider(min=0, max=100, value=50, size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+
+        # set range of slider to 0-200 with decimal places
+        speed_slider.range = (0, 200)
+        speed_slider.value = 100
+        speed_slider.precision = 1
+
+
+        speed_slider.size_hint_x = 1
+        speed_slider.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        speed_box.add_widget(speed_slider)
+
+        # give id to speed slider
+        self.ids['speed_slider'] = speed_slider
+
+        # Button to set speed
+        speed_button = MDRectangleFlatButton(text="Set Speed")
+
+        # on press, send command to set speed
+        speed_button.on_press = lambda: self.sendSpeed(self.ip, self.ids['speed_slider'].value)
+
+
+
+        speed_button.size_hint_x = 1
+        speed_button.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        speed_box.add_widget(speed_button)
+
+
+
+        # add speed box to main box
+        main_box.add_widget(speed_box)
+
+
+
 
         # set the size of the main box
         main_box.size_hint = (1, 0.5)
@@ -368,6 +427,9 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
         self.manager.dev_type = dev_type
         self.manager.ip = devices_storage[dev_name]['ip']
         self.manager.desc = devices_storage[dev_name]['desc']
+
+        self.ip=devices_storage[dev_name]['ip']
+        print("added ip")
 
 
         App.get_running_app().root.current = 'ScreenIOTControl'
