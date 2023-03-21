@@ -37,9 +37,9 @@ void Transmit(String sending) { // 8 bytes required
 
 void Transmit_speed(String command,int speed) {
   Wire.beginTransmission(8);
-  
-  Wire.write(((command+String(speed)).c_str()));
-  
+  String data = String(speed)+" --Speed";
+  Wire.write((String(data)).c_str());
+  Serial.println("Speed command "+String(speed)+" --Speed");
   Wire.endTransmission();
   //Wire.write('hello'.c_str());
 }
@@ -53,11 +53,12 @@ void handleAPI() { // this should be the web server receiving commands
   String command = server.arg("command"); // What action
   String speed = server.arg("speed"); // stepper speed
 
-  if (command == "STEPSPED"){ // if Command = SPEED get speed var and send with a dict style: Key - Val
+  if (speed != NULL){ // if Command = SPEED get speed var and send with a dict style: Key - Val
     //Serial.println("Hello, your command was successful, :)");
     digitalWrite(LED_BUILTIN, 1);
     String transmitString = speed+"--Speed"; // hopefully we can actually do something with this lol.
-
+    Serial.println("Speed Arg worked!");
+    Serial.println(speed);
     Transmit_speed(transmitString,speed.toInt()); // sends to TRANSMIT function which sends to Arduino
     message += "Setting speed to:";
     message += speed;

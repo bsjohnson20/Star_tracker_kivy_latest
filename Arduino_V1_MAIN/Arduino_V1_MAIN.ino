@@ -25,7 +25,7 @@ Stepper myStepper(stepsPerRevolution, 12, 10, 11, 9); // initalise stepper
 int stepCount = 0;  // number of steps the motor has taken
 // default
 const int def_time = 7361; // constant, so  we can reset to the hardcoded default.
-int t = 7361; // no longer a constant, this is to allow changing speed in runtime
+float t = 7361; // no longer a constant, this is to allow changing speed in runtime
 // faster
 //const int t = 3680; // const for time between steps
 //fastest
@@ -46,7 +46,7 @@ void receiveEvent(int howMany) {
     //Serial.println(c); - don't need, keep as backup.
     Store.concat(String(c));        // print the character
   }
-  Serial.println(Store);
+  Serial.println("Store now equals: "+Store);
   if (Store.endsWith(" --Stepper")){ // Hope to Add multiple args?
     Store.replace(" --Stepper",""); // remove it, this means I can actually ignore args now
     Serial.println("Store: "+Store);
@@ -64,16 +64,22 @@ void receiveEvent(int howMany) {
       move = 0;
     }
   
-
-  else if (Store.endsWith("--Speed")){
-    Store.replace("--Speed","");
-    t = Store.toInt();
+  }
+  else if (Store.endsWith(" --Speed")){
+    Store.replace(" --Speed","");
+    t = def_time * (Store.toFloat()/100);
+    Serial.println("SENDING SPEED CHANGE");
+    Serial.println("Time per step is now: "+String(t));
   }
   
-  else if (Store.endsWith("--RESET_SPEED")){
+  else if (Store.endsWith(" --RESET_SPEED")){
     t = def_time; // resets t
   }
+
+  else{
+    Serial.println("How did we get here??");
   }
+  
 }
   
 
