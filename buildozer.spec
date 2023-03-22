@@ -48,7 +48,7 @@ requirements = python3,kivy==2.0.0,kivymd==1.1.1, idna, python-docx, docx, excep
 
 # (str) Icon of the application
 #
-Icon.filename = %(source.dir)s/Princess_Luna_Remul-Lemlem_personaluse_fairuse.png
+# Icon.filename = %(source.dir)s/Princess_Luna_Remul-Lemlem_personaluse_fairuse.png
 
 # (list) Supported orientations
 # Valid options are: landscape, portrait, portrait-reverse or landscape-reverse
