@@ -3,6 +3,8 @@
 
 import os
 import threading  # look at how many threads are running, if too many, just add more. Make user explode.
+from typing import Union
+
 import trio
 import requests
 
@@ -29,6 +31,7 @@ from kivymd.uix.button import MDIconButton, MDRectangleFlatButton
 from kivymd.uix.card import MDCard, MDCardSwipe
 from kivymd.uix.label import MDLabel
 from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.pickers import MDColorPicker
 from kivymd.uix.slider import MDSlider
 
 Label = MDLabel
@@ -823,18 +826,47 @@ class LunaApp(
         self.root.current = 'Screen2'
         """
 
+    def open_color_picker(self):
+        color_picker = MDColorPicker(size_hint=(0.45, 0.85))
+        color_picker.open()
+        color_picker.bind(
+            on_select_color=self.on_select_color,
+            on_release=self.get_selected_color,
+        )
+
+    def update_color(self, color: list) -> None:
+        print(f"Setting color to {color}, args are {color}")
+        self.theme_primary = color
+
+        # save theme setting to settings.json
+        settings_storage.put('theme', args=color)
+
+    def get_selected_color(
+            self,
+            instance_color_picker: MDColorPicker,
+            type_color: str,
+            selected_color: Union[list, str],
+    ):
+        '''Return selected color.'''
+
+        print(f"Selected color is {selected_color}")
+        self.update_color(selected_color[:-1] + [1])
+
+    def on_select_color(self, instance_gradient_tab, color: list) -> None:
+        '''Called when a gradient image is clicked.'''
 
 
+# defunct code
     # set color
-    def set_color(self, color, *args):
-        if self.allowThemeSaving:
-            print(f"Setting color to {color}, args are {args}")
-            self.theme_primary = args
-
-            # save theme setting to settings.json
-            settings_storage.put('theme', args=args[0])
-        else: # we shouldn't be saving the theme yet
-            print("Attempted to save theme, but not allowed to save theme yet")
+    #def set_color(self, color, *args):
+     #   if self.allowThemeSaving:
+      #      print(f"Setting color to {color}, args are {args}")
+       #     self.theme_primary = args
+#
+ #           # save theme setting to settings.json
+  #          settings_storage.put('theme', args=args[0])
+   #     else: # we shouldn't be saving the theme yet
+    #        print("Attempted to save theme, but not allowed to save theme yet")
 
 
 
