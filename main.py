@@ -4,31 +4,25 @@
 import os
 import threading  # look at how many threads are running, if too many, just add more. Make user explode.
 from typing import Union
+
 import trio
-
-# start removing this request library, it might be causing the crash. I mean, I'm not sure, but it might be.
-import requests
-
-from kivy.logger import Logger
 from kivy.app import App  # the beloved app
 from kivy.core.window import Window  # Windows 12, the best windows
-from kivy.graphics import Color, Rectangle, Canvas
+from kivy.logger import Logger
 from kivy.metrics import \
-    dp  # density pixels, used for scaling, 1 dp = 1 pixel on a 160 dpi screen, 2 pixels on a 320 dpi screen, 4 pixels on a 640 dpi screen, and so on. Unfortunatly, this is not the case for all devices, so you have to use the kivy.metrics module to get the correct scaling. cry
+    dp  # density pixels, used for scaling, 1 dp = 1 pixel on a 160 dpi screen, 2 pixels on a 320 dpi screen,
+# 4 pixels on a 640 dpi screen, and so on. Unfortunately, this is not the case for all devices, so you have to use the
+# kivy.metrics module to get the correct scaling. cry
 from kivy.network.urlrequest import UrlRequest
 from kivy.properties import ObjectProperty, BooleanProperty, ListProperty
 from kivy.properties import StringProperty  # string property, used for storing strings
 from kivy.storage.jsonstore import JsonStore  # use for storing data
-from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.boxlayout import BoxLayout  # box layout, used for making boxes
 from kivy.uix.button import Button  # button, used for making buttons and making users click them and get mad at you
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
-from kivy.utils import rgba
 from kivymd.app import MDApp
 from kivymd.uix.button import MDIconButton, MDRectangleFlatButton
 from kivymd.uix.card import MDCard, MDCardSwipe
@@ -37,11 +31,11 @@ from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.pickers import MDColorPicker
 from kivymd.uix.slider import MDSlider
 
+# start removing this request library, it might be causing the crash. I mean, I'm not sure, but it might be.
+
 Label = MDLabel
 settings_storage = JsonStore('settings.json')
 devices_storage = JsonStore('devices.json')
-
-
 
 # settings_storage.put("LunaDevice",ip="123.42.12",desc="Hello!",LastOnline=5245425)
 # settings_storage.get("LunaDevice")
@@ -64,7 +58,8 @@ class TitleLabel(BoxLayout):
     color = ListProperty([1, 0, 0.5, 1])
 
 
-class DeviceDataPage(Widget): # inputs for device data. Standardised to cause less confusion. Actually, it causes more confusion. Just kidding, it causes even more confusion.
+class DeviceDataPage(
+    Widget):  # inputs for device data. Standardised to cause less confusion. Actually, it causes more confusion. Just kidding, it causes even more confusion.
     pass
 
 
@@ -83,6 +78,7 @@ class IOT_toolbar(BoxLayout):  # toolbar, used for making the toolbar. Make it e
     dev_name = StringProperty("Test")
     ip = StringProperty("3243242")
     address = StringProperty("32432423324324")
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -178,11 +174,10 @@ class DeviceSettings(
             self.manager.get_screen('ScreenIOTControl').ids['ip'].text = new_ip
             self.dev_type = self.manager.get_screen('ScreenIOTControl').ids['dev_type'].text
 
-
             # delete old key in device_storage
             devices_storage.delete(old_name)
             # add new key in device_storage
-            devices_storage.put(new_name, ip=new_ip, desc=new_desc,device_type=self.dev_type)
+            devices_storage.put(new_name, ip=new_ip, desc=new_desc, device_type=self.dev_type)
 
             # swap to IOT_screen
             self.manager.current = "ScreenIOTControl"
@@ -209,7 +204,6 @@ class OnlineCheck():  # checking if the device is online - pretty sure this is d
         # use logging module to log
         Logger.info(f"OnlineCheck: {self.url}")
 
-
     # check if online
     def is_online(self):
         # use ping in os module
@@ -221,7 +215,6 @@ class OnlineCheck():  # checking if the device is online - pretty sure this is d
         else:
             self.status = "offline"
             return False
-
 
 
 class onlineButton(MDIconButton):  # button to check if online
@@ -263,7 +256,9 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
         print(self.ip)
         result = UrlRequest(f"http://{self.ip}/api?command={command}", on_success=self.success, on_failure=self.failure,
                             on_error=self.error, on_redirect=self.redirect)
-        print(result.result)
+        if result.result is None:
+            # popup
+            popup("Error", "Unable to connect to device, please check  IP address and try again. Or your device may not have replied", "Or your device is unreachable due to not being on the same network")
 
     def success(self, *args, **kwargs):  # success callback
         Logger.info("Success!")
@@ -273,12 +268,14 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
     def failure(self, *args, **kwargs):  # failure callback
         Logger.info("Failure!")
         # create popup
-        popup("Failure", "Unable to connect to device, please check  IP address and try again", "Or your device may be offline", "Or your device is unreachable")
+        popup("Failure", "Unable to connect to device, please check  IP address and try again",
+              "Or your device may be offline", "Or your device is unreachable")
 
     def error(self, *args, **kwargs):  # error callback
         Logger.info("Error!")
         # load popup
-        popup("Error", "Unable to connect to device, please check  IP address and try again", "Or your device may be offline", "Or your device is unreachable due to not being on the same network")
+        popup("Error", "Unable to connect to device, please check  IP address and try again",
+              "Or your device may be offline", "Or your device is unreachable due to not being on the same network")
 
     def redirect(self, *args, **kwargs):  # redirect callback
         Logger.info("Redirect!")
@@ -288,7 +285,7 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
         print(self.ip)
         try:
             result = UrlRequest(f"http://{self.ip}/api?speed={speed}", on_success=self.success, on_failure=self.failure,
-                          on_error=self.error, on_redirect=self.redirect)
+                                on_error=self.error, on_redirect=self.redirect)
             Logger.info(result.result)
         except ConnectionError:
             print("Unable to send, as no connection!")
@@ -339,7 +336,7 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
 
         # add gridlayout to info
         info_grid = GridLayout(cols=2, spacing=10, padding=10, size_hint=(
-        1, 1))  # grids are cool, boxes are cool. but what about boxes in grids in grids? that is cool too.
+            1, 1))  # grids are cool, boxes are cool. but what about boxes in grids in grids? that is cool too.
         info.add_widget(info_grid)
 
         # add labels to gridlayout
@@ -385,7 +382,7 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
         # controls:
         # box
         controls_box = BoxLayout(orientation="horizontal", spacing=10, padding=10, size_hint=(1,
-                                                                                                0.5))  # control that brain of yours, and make it do what you want it to do. and actually do it, not just think about it.
+                                                                                              0.5))  # control that brain of yours, and make it do what you want it to do. and actually do it, not just think about it.
         controls_box.size_hint_x = 1
         # actual
         forw = MDRectangleFlatButton(text="forward", on_press=lambda x: self.sendCommand(self.ip, "STEPFORW"))
@@ -410,13 +407,13 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
         speed_box.size_hint_x = 1
 
         # add speed slider
-        speed_slider = MDSlider(min=0, max=100, value=50, size_hint=(1, 0.5), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        speed_slider = MDSlider(min=0, max=100, value=50, size_hint=(1, 0.5),
+                                pos_hint={'center_x': 0.5, 'center_y': 0.5})
 
         # set range of slider to 0-200 with decimal places
         speed_slider.range = (0, 200)
         speed_slider.value = 100
         speed_slider.precision = 1
-
 
         speed_slider.size_hint_x = 1
         speed_slider.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
@@ -431,19 +428,12 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
         # on press, send command to set speed
         speed_button.on_press = lambda: self.sendSpeed(self.ip, self.ids['speed_slider'].value)
 
-
-
         speed_button.size_hint_x = 1
         speed_button.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
         speed_box.add_widget(speed_button)
 
-
-
         # add speed box to main box
         main_box.add_widget(speed_box)
-
-
-
 
         # set the size of the main box
         main_box.size_hint = (1, 0.5)
@@ -459,9 +449,8 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
         self.manager.ip = devices_storage[dev_name]['ip']
         self.manager.desc = devices_storage[dev_name]['desc']
 
-        self.ip=devices_storage[dev_name]['ip']
+        self.ip = devices_storage[dev_name]['ip']
         print("added ip")
-
 
         App.get_running_app().root.current = 'ScreenIOTControl'
 
@@ -627,6 +616,7 @@ class Deletethis(MDIconButton):
         # delete from database
         devices_storage.delete(dev_name)
 
+
 class ScreenHome(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -639,20 +629,20 @@ class ScreenHome(Screen):
         Generates cards to be put into the Home screen this contains the Devices name, desc and ip and a button to open the page for it.
         :return:
         """
-        self2 = self
-        self = App.get_running_app().root.ids.screen_Home_id.ids.add_here
+        add_grid = App.get_running_app().root.ids.screen_Home_id.ids.add_here
 
         for child in [child for child in
-                      self.children]:  # clear screen - this lets us update the screen as well! - no this isn't a lazy workaround so I don't have to append instead... and write a new builder
-            self.remove_widget(child)
+                      add_grid.children]:  # clear screen - this lets us update the screen as well! - no this isn't a lazy workaround so I don't have to append instead... and write a new builder
+            add_grid.remove_widget(child)
         print(devices_storage.count())
         for item in devices_storage:
             print(item)
             new = codeinpain(item, devices_storage[item]['device_type'])
-            self.parent.item = item
+            add_grid.parent.item = item
 
             # create THE Box this'll contain labels and the buton to open the corresponding IOT panel
-            Box = DeviceCard(dev_name=item, ip=devices_storage[item]['ip'], desc=devices_storage[item]['desc'], device=devices_storage[item]['device_type'])
+            Box = DeviceCard(dev_name=item, ip=devices_storage[item]['ip'], desc=devices_storage[item]['desc'],
+                             device=devices_storage[item]['device_type'])
             # add color to Box
             # make it pretty
             # it didn't work :(, I wish It did. Then I could be a genius.
@@ -661,14 +651,13 @@ class ScreenHome(Screen):
             # loop through attributes of box
 
             # add Box to screen
-            self.add_widget(Box)
+            add_grid.add_widget(Box)
 
             # set size and width to exactly half of window size
             Box.size_hint_x = 1
             print(Box.ids)
             # clickable image
-            print("BINDING TO " + self.parent.item + " " + devices_storage[item]['device_type'])
-
+            print("BINDING TO " + add_grid.parent.item + " " + devices_storage[item]['device_type'])
 
     # update rectangle position and size
     def _update_rect(self, instance, value, *args):
@@ -684,12 +673,12 @@ class ScreenMain(
 
 
 # testing
-class DeviceCard(MDCardSwipe): # this one stores the name, desc, ip and type of the device, and a button to open the IOT panel for it. Probably...
+class DeviceCard(
+    MDCardSwipe):  # this one stores the name, desc, ip and type of the device, and a button to open the IOT panel for it. Probably...
     dev_name = StringProperty()
     device = StringProperty()
     ip = StringProperty()
     desc = StringProperty()
-
 
     def __init__(self, dev_name, ip, desc, device, **kwargs):
         super().__init__(**kwargs)
@@ -698,14 +687,15 @@ class DeviceCard(MDCardSwipe): # this one stores the name, desc, ip and type of 
         self.ip = ip
         self.desc = desc
         self.on_release = lambda: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(dev_name,
-                                                                                               devices_storage[dev_name][
+                                                                                               devices_storage[
+                                                                                                   dev_name][
                                                                                                    'device_type'])
+
     def open(self):
         App.get_running_app().root.ids.screen_IOTControl_id.loadPage(self.dev_name,
-                                                                             devices_storage[self.dev_name][
-                                                                                 'device_type'])
+                                                                     devices_storage[self.dev_name][
+                                                                         'device_type'])
         print("OPENING")
-
 
 
 class Manager(
@@ -732,12 +722,10 @@ class ToolBar(BoxLayout):
         add_to = self
         # bind size and position to update rectangle
 
-
         # update size on window resize
         # add padding to half the width of root screen
 
     # function to update size on resize
-
 
     # function to update size on resize
 
@@ -803,6 +791,7 @@ class MeButton(MDIconButton):  # This is me, I am that button. I am a genius.
 class LunaApp(
     MDApp):  # here we have the main app class, it is the main class, and it is not a class, it is a god. I am a genius.
     allowThemeSaving = BooleanProperty()
+
     def __init__(self, nursery, **kwargs):
         super().__init__(**kwargs)
         self.nursery = nursery
@@ -815,12 +804,11 @@ class LunaApp(
         self.theme_primary = [0.5, 0, 0.5, 1]
         self.allowThemeSaving = False
         try:
-            self.theme_primary=settings_storage.get('theme')['args']
+            self.theme_primary = settings_storage.get('theme')['args']
             print(self.theme_primary)
         except KeyError:
             # save default theme
             settings_storage.put('theme', args=self.theme_primary)
-
 
     def build(self):  # this is the build method, it builds the app, and it does it well. I am a genius.
         """This method returns the Manager class"""
@@ -861,7 +849,7 @@ class LunaApp(
         color_picker.open()
         color_picker.bind(
             on_select_color=self.on_select_color,
-            on_release=self.get_selected_color,
+            on_release=self.get_selected_color
         )
 
     def update_color(self, color: list) -> None:
@@ -887,18 +875,16 @@ class LunaApp(
 
 
 # defunct code
-    # set color
-    #def set_color(self, color, *args):
-     #   if self.allowThemeSaving:
-      #      print(f"Setting color to {color}, args are {args}")
-       #     self.theme_primary = args
+# set color
+# def set_color(self, color, *args):
+#   if self.allowThemeSaving:
+#      print(f"Setting color to {color}, args are {args}")
+#     self.theme_primary = args
 #
- #           # save theme setting to settings.json
-  #          settings_storage.put('theme', args=args[0])
-   #     else: # we shouldn't be saving the theme yet
-    #        print("Attempted to save theme, but not allowed to save theme yet")
-
-
+#           # save theme setting to settings.json
+#          settings_storage.put('theme', args=args[0])
+#     else: # we shouldn't be saving the theme yet
+#        print("Attempted to save theme, but not allowed to save theme yet")
 
 
 class ScreenCredits(Screen):  # I am the absolute best, I am a god, and I am a genius.
