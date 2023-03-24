@@ -37,7 +37,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy==master,kivymd, idna, python-docx, docx, exceptiongroup, certifi, trio, attrs, async-generator, sniffio, outcome, cffi, sortedcontainers, charset-normalizer, urllib3, chardet, requests, Cython
+requirements = python3,kivy==master,kivymd, python-docx, docx, exceptiongroup, trio, attrs, async-generator, sniffio, outcome, cffi, sortedcontainers, charset-normalizer, urllib3, chardet, Cython
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
