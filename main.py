@@ -4,15 +4,18 @@
 import os
 import threading  # look at how many threads are running, if too many, just add more. Make user explode.
 from typing import Union
-
 import trio
+
+# start removing this request library, it might be causing the crash. I mean, I'm not sure, but it might be.
 import requests
 
+from kivy.logger import Logger
 from kivy.app import App  # the beloved app
 from kivy.core.window import Window  # Windows 12, the best windows
 from kivy.graphics import Color, Rectangle, Canvas
 from kivy.metrics import \
     dp  # density pixels, used for scaling, 1 dp = 1 pixel on a 160 dpi screen, 2 pixels on a 320 dpi screen, 4 pixels on a 640 dpi screen, and so on. Unfortunatly, this is not the case for all devices, so you have to use the kivy.metrics module to get the correct scaling. cry
+from kivy.network.urlrequest import UrlRequest
 from kivy.properties import ObjectProperty, BooleanProperty, ListProperty
 from kivy.properties import StringProperty  # string property, used for storing strings
 from kivy.storage.jsonstore import JsonStore  # use for storing data
@@ -37,6 +40,8 @@ from kivymd.uix.slider import MDSlider
 Label = MDLabel
 settings_storage = JsonStore('settings.json')
 devices_storage = JsonStore('devices.json')
+
+
 
 # settings_storage.put("LunaDevice",ip="123.42.12",desc="Hello!",LastOnline=5245425)
 # settings_storage.get("LunaDevice")
@@ -201,6 +206,9 @@ class OnlineCheck():  # checking if the device is online - pretty sure this is d
         # self.url = "https://google.com"
         self.timeout = 5
         self.status = "waiting"
+        # use logging module to log
+        Logger.info(f"OnlineCheck: {self.url}")
+
 
     # check if online
     def is_online(self):
@@ -234,8 +242,10 @@ class onlineButton(MDIconButton):  # button to check if online
         # check if online
         if OnlineCheck(ip, 5000).is_online():
             self.parent.ids["status"].text = "online"
+            Logger.info("online")
         else:
             self.parent.ids["status"].text = "offline"
+            Logger.info("offline")
 
 
 class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
@@ -251,19 +261,37 @@ class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
     def sendCommand(self, ip, command, *args, **kwargs):  # sends command to device
         # use requests to send command to device with format http://ip:port/api?command=command+"
         print(self.ip)
-        result = requests.get(f"http://{self.ip}/api?command={command}")
-        print(result.text)
+        result = UrlRequest(f"http://{self.ip}/api?command={command}", on_success=self.success, on_failure=self.failure,
+                            on_error=self.error, on_redirect=self.redirect)
+        print(result.result)
+
+    def success(self, *args, **kwargs):  # success callback
+        Logger.info("Success!")
+        # create popup
+        popup("Success", "Command sent successfully")
+
+    def failure(self, *args, **kwargs):  # failure callback
+        Logger.info("Failure!")
+        # create popup
+        popup("Failure", "Unable to connect to device, please check  IP address and try again", "Or your device may be offline", "Or your device is unreachable")
+
+    def error(self, *args, **kwargs):  # error callback
+        Logger.info("Error!")
+        # load popup
+        popup("Error", "Unable to connect to device, please check  IP address and try again", "Or your device may be offline", "Or your device is unreachable due to not being on the same network")
+
+    def redirect(self, *args, **kwargs):  # redirect callback
+        Logger.info("Redirect!")
 
     def sendSpeed(self, ip, speed, *args, **kwargs):  # sends speed to device
         # use requests to send command to device with format http://ip:port/api?speed=speed"
         print(self.ip)
         try:
-            result = requests.get(f"http://{self.ip}/api?speed={speed}")
-            print(result.text)
+            result = UrlRequest(f"http://{self.ip}/api?speed={speed}", on_success=self.success, on_failure=self.failure,
+                          on_error=self.error, on_redirect=self.redirect)
+            Logger.info(result.result)
         except ConnectionError:
             print("Unable to send, as no connection!")
-        except requests.exceptions.ConnectionError:
-            print("Unable to send as no connection!")
 
     def loadPage(self, dev_name, dev_type, **kwargs):  # assembles the IOT screen and your big brain
         """
@@ -562,8 +590,10 @@ class ScreenAddDevice(
 
 def popup(error, *args):  # popup to annoy the user
     box = BoxLayout(orientation="vertical")
-    popup = Popup(title='Error', content=box, size_hint={0.4, 0.2})
+    popup = Popup(title='Error', content=box, size_hint=(None, None), size=(400, 400), auto_dismiss=False)
     box.add_widget(Label(text=error))
+    for i in args:
+        box.add_widget(Label(text=i))
     box.add_widget(Button(text="Close", on_press=popup.dismiss))
     popup.open()
 
