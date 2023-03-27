@@ -506,11 +506,10 @@
         BoxLayout:
             orientation: 'vertical'
             size_hint_y: 0.9
-            ColorPicker:
-                id: color_picker
-                size_hint_y: 0.8
-                size_hint_x: 1
-                on_color: app.get_running_app().set_color(*args)
+            MDRaisedButton:
+                text: "OPEN PICKER"
+                pos_hint: {"center_x": .5, "center_y": .5}
+                on_release: app.open_color_picker()
 
 
 

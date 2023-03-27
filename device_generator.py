@@ -17,7 +17,7 @@ class DeviceGenerator:
         for i in range(0,count):
             devices['luna'+str(i)]= {
                 "desc": str(self.device_descs[i]),
-                "ip": f"{random.randint(1, 255)}'.'{random.randint(1, 255)}'.'{random.randint(1, 255)}'.'{random.randint(1, 255)}",
+                "ip": f"{random.randint(1, 255)}.{random.randint(1, 255)}.{random.randint(1, 255)}.{random.randint(1, 255)}",
                 "device_type": random.choice(self.device_types)
             }
 
