@@ -29,7 +29,7 @@ source.include_exts = py,png,jpg,kv,atlas
 #source.exclude_patterns = license,images/*/*.jpg
 
 # (str) Application versioning (method 1)
-version = 0.1
+version = 0.2
 
 # (str) Application versioning (method 2)
 # version.regex = __version__ = ['"](.*)['"]
@@ -37,7 +37,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy==master,kivymd, idna, python-docx, docx, exceptiongroup, certifi, trio, attrs, async-generator, sniffio, outcome, cffi, sortedcontainers, charset-normalizer, urllib3, chardet, requests, Cython
+requirements = python3,kivy==2.1.0,https://github.com/kivymd/KivyMD/archive/master.zip, idna, pillow, python-docx, docx, urllib3, exceptiongroup, certifi, trio, attrs, async-generator, sniffio, chardet, outcome, cffi, sortedcontainers, charset-normalizer, requests
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -47,7 +47,8 @@ requirements = python3,kivy==master,kivymd, idna, python-docx, docx, exceptiongr
 #presplash.filename = %(source.dir)s/data/presplash.png
 
 # (str) Icon of the application
-#icon.filename = %(source.dir)s/data/icon.png
+#
+Icon.filename = %(source.dir)s/rsz_1princess_luna__open_collab__by_earthlyflyer-db57gxb.png
 
 # (list) Supported orientations
 # Valid options are: landscape, portrait, portrait-reverse or landscape-reverse
