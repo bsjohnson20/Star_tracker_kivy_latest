@@ -71,7 +71,7 @@ class ScreenWelcome(Screen):
 class ScreenAboutMe(Screen):  # What about me?
     def open_dialog(self):
         # open popup telling user they have saved their theme successfully
-        popup("You have successfully saved your theme!", "")
+        pass
 
 
 class IOT_toolbar(BoxLayout):  # toolbar, used for making the toolbar. Make it explode! OR the stakeholder will explode!
@@ -161,6 +161,7 @@ class DeviceSettings(
             print("Invalid Name")
             # summon popup
             popup("Invalid Name", "Please ensure all fields are filled")
+
 
         else:
             # error not here
@@ -487,7 +488,7 @@ class ValidatingTool:  # useful but useless inheritance, equal to 0 dollars.
             return False
 
     def checkDevType(self, dev_type):  # check if device type is valid
-        if dev_type == "Choose Device Type":
+        if dev_type == "Device Types":
             return False
         else:
             return True  # return true if valid
@@ -868,7 +869,10 @@ class LunaApp(
         '''Return selected color.'''
 
         print(f"Selected color is {selected_color}")
+        # close color picker
+        instance_color_picker.dismiss()
         self.update_color(selected_color[:-1] + [1])
+        popup("You have successfully saved your theme!", "")
 
     def on_select_color(self, instance_gradient_tab, color: list) -> None:
         '''Called when a gradient image is clicked.'''
@@ -904,3 +908,4 @@ if __name__ == "__main__":  # boilerplate code to boil the plate, I am a genius.
     trio.run(main)  # run the app
 
 # if you noticed the comments, I let CoPilot write them, I am a genius. YUp, I am a genius. I am the best program. I am the best programmer and I am the best pet. Even though I am a cat, I can still be the best pet. I am a genius. I love you, I am a genius.
+
