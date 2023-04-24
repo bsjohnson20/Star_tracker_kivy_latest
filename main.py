@@ -150,6 +150,15 @@ class DeviceSettings(
         new_ip = ip
         new_name = dev_name
         new_desc = desc
+        # check if name exists in database:
+        print("test")
+        # checks if the device to change is the same as the one wanting to change is the same
+        print(f"new_ip: {new_ip}\n"
+              f"new_name: {dev_name}\n"
+              f"new_desc: {desc}\n"
+              f"ip: {ip}\n"
+              f"dev_name: {dev_name_old}\n")
+
 
         # validate using ValidatingTool
         if not ValidatingTool.checkIP(self, ip=new_ip):
@@ -162,11 +171,12 @@ class DeviceSettings(
             # summon popup
             popup("Invalid Name", "Please ensure all fields are filled")
 
-        # check if name exists in database:
-        print("test")
-        if not(dev_name in devices_storage) or (new_name in devices_storage): # checks if it already exists, if it's the one stored then allow, if it's changing into one in there then don't allow.
-            print("Device already in database\n choose a new name")
-            popup("Already in database\n choose a new name")
+        # check if name exists in database - if it does and it's the same one using old_name then it's fine, else it's not
+        # print an error if it's not
+        elif new_name in devices_storage.keys() and new_name != dev_name_old:
+            print("Name already exists")
+            # summon popup
+            popup("Name already exists", "Please enter a different name")
 
 
         else:
@@ -218,10 +228,10 @@ class OnlineCheck():  # I want to use Kivy's builtin function, but I haven't imp
         response = os.system("ping -n 1 " + self.url)
         # and then check the response...
         if response == 0:
-            self.status = "online"
+            self.status = "Online"
             return True
         else:
-            self.status = "offline"
+            self.status = "Offline"
             return False
 
 
@@ -242,10 +252,10 @@ class onlineButton(MDIconButton):  # button to check if online
                      ip):
         # check if online
         if OnlineCheck(ip, 5000).is_online():
-            self.parent.ids["status"].text = "online"
+            self.parent.ids["status"].text = "Online"
             Logger.info("online")
         else:
-            self.parent.ids["status"].text = "offline"
+            self.parent.ids["status"].text = "Online"
             Logger.info("offline")
 
 
