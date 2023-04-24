@@ -146,7 +146,7 @@ class DeviceSettings(
         print(f"Desc: {self.desc}")
         print(f"IP: {self.ip}")
 
-    def save(self, dev_name, ip, desc):
+    def save(self, dev_name_old,dev_name, ip, desc):
         new_ip = ip
         new_name = dev_name
         new_desc = desc
