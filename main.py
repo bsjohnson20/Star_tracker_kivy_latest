@@ -200,7 +200,7 @@ def fetchvalues():  # fetches values from the IOT screen so we can use in the se
     return dev_name, dev_type, ip, desc
 
 
-class OnlineCheck():  # checking if the device is online - pretty sure this is defunct, I just cant be bothered to delete it
+class OnlineCheck():  # I want to use Kivy's builtin function, but I haven't implemented it yet.
     def __init__(self, ip, port, **kwargs):
         super().__init__(**kwargs)
         self.url = f"{ip}"
@@ -209,10 +209,11 @@ class OnlineCheck():  # checking if the device is online - pretty sure this is d
         self.timeout = 5
         self.status = "waiting"
         # use logging module to log
-        Logger.info(f"OnlineCheck: {self.url}")
+        Logger.info(f"OnlineCheck: loaded CheckSystem; ip = {self.url}")
 
     # check if online
     def is_online(self):
+        Logger.info(f"Checking if device isOnline")
         # use ping in os module
         response = os.system("ping -n 1 " + self.url)
         # and then check the response...
@@ -238,7 +239,7 @@ class onlineButton(MDIconButton):  # button to check if online
         self.thread.start()
 
     def check_online(self,
-                     ip):  # magic happens here, really it just returns online or offline and sets the status label proxy of the IOT screen
+                     ip):
         # check if online
         if OnlineCheck(ip, 5000).is_online():
             self.parent.ids["status"].text = "online"
@@ -248,7 +249,7 @@ class onlineButton(MDIconButton):  # button to check if online
             Logger.info("offline")
 
 
-class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
+class ScreenIOTControl(Screen):  # screen for controlling IOT devices
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
