@@ -71,7 +71,7 @@ class ScreenWelcome(Screen):
 class ScreenAboutMe(Screen):  # What about me?
     def open_dialog(self):
         # open popup telling user they have saved their theme successfully
-        popup("You have successfully saved your theme!", "")
+        pass
 
 
 class IOT_toolbar(BoxLayout):  # toolbar, used for making the toolbar. Make it explode! OR the stakeholder will explode!
@@ -162,6 +162,13 @@ class DeviceSettings(
             # summon popup
             popup("Invalid Name", "Please ensure all fields are filled")
 
+        # check if name exists in database:
+        print("test")
+        if not(dev_name in devices_storage) or (new_name in devices_storage): # checks if it already exists, if it's the one stored then allow, if it's changing into one in there then don't allow.
+            print("Device already in database\n choose a new name")
+            popup("Already in database\n choose a new name")
+
+
         else:
             # error not here
             # set the values in IOT_screen
@@ -193,7 +200,7 @@ def fetchvalues():  # fetches values from the IOT screen so we can use in the se
     return dev_name, dev_type, ip, desc
 
 
-class OnlineCheck():  # checking if the device is online - pretty sure this is defunct, I just cant be bothered to delete it
+class OnlineCheck():  # I want to use Kivy's builtin function, but I haven't implemented it yet.
     def __init__(self, ip, port, **kwargs):
         super().__init__(**kwargs)
         self.url = f"{ip}"
@@ -202,10 +209,11 @@ class OnlineCheck():  # checking if the device is online - pretty sure this is d
         self.timeout = 5
         self.status = "waiting"
         # use logging module to log
-        Logger.info(f"OnlineCheck: {self.url}")
+        Logger.info(f"OnlineCheck: loaded CheckSystem; ip = {self.url}")
 
     # check if online
     def is_online(self):
+        Logger.info(f"Checking if device isOnline")
         # use ping in os module
         response = os.system("ping -n 1 " + self.url)
         # and then check the response...
@@ -231,7 +239,7 @@ class onlineButton(MDIconButton):  # button to check if online
         self.thread.start()
 
     def check_online(self,
-                     ip):  # magic happens here, really it just returns online or offline and sets the status label proxy of the IOT screen
+                     ip):
         # check if online
         if OnlineCheck(ip, 5000).is_online():
             self.parent.ids["status"].text = "online"
@@ -241,7 +249,7 @@ class onlineButton(MDIconButton):  # button to check if online
             Logger.info("offline")
 
 
-class ScreenIOTControl(Screen):  # IOT screen - what did you expect?
+class ScreenIOTControl(Screen):  # screen for controlling IOT devices
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -487,7 +495,7 @@ class ValidatingTool:  # useful but useless inheritance, equal to 0 dollars.
             return False
 
     def checkDevType(self, dev_type):  # check if device type is valid
-        if dev_type == "Choose Device Type":
+        if dev_type == "Device Types":
             return False
         else:
             return True  # return true if valid
@@ -744,25 +752,22 @@ def changeScreenAdd(*args, **kwargs):  # change screen to ScreenAdd, because I c
     App.get_running_app().root.last_screen = 'ScreenHome'
 
 
-class HomeButton(MDIconButton):  # wanna go home? You can't, because you are already home. I am a genius.
+class HomeButton(MDIconButton):  # Home button, does nothing, purely aesthetic.
     # set image to resources/plus.png
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        # set icon to house
         self.icon = 'home'
+
+        # set to third of total area, and full height
         self.size_hint = (0.3, 1)
-        # self.icon_size = "64dp"
-        # self.size = (50, 50)
-        # root.manager.current = root.manager.last_screen
-        #                     root.manager.last_screen = "ScreenAdd"
-
-        # set bind to the button press to open the add screen
-
+        # change to home
         self.on_release = changeScreenHome
         # scale image to height of root widget
         self.image_size = self.size
 
 
-class AddButton(MDIconButton):  # this is getting out of hand, I am a genius.
+class AddButton(MDIconButton):  # add button for new devices, actually does something.
     # set image to resources/plus.png
 
     def __init__(self, **kwargs):  # buttons are cool, I am a genius.
@@ -776,12 +781,12 @@ class AddButton(MDIconButton):  # this is getting out of hand, I am a genius.
         print(self.size)
 
 
-class MeButton(MDIconButton):  # This is me, I am that button. I am a genius.
+class MeButton(MDIconButton):  # This is me, it's a me, Mario!
     # set image to resources/plus.png
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # self.icon_size = "64dp"
-        self.icon = 'account'
+        self.icon = 'cog'
         # self.source = 'resources/anonymous-person-icon-23.jpg'
         self.size_hint = (0.3, 1)
         # self.size = (50, 50)
@@ -795,6 +800,8 @@ class LunaApp(
     def __init__(self, nursery, **kwargs):
         super().__init__(**kwargs)
         self.nursery = nursery
+
+        # theming, overcomplicated, and I don't know if it's all necessary, but it works.
         self.title = "Luna"
         self.theme_cls.theme_style = "Dark"
         self.theme_cls.primary_palette = "Purple"
@@ -802,11 +809,11 @@ class LunaApp(
         self.theme_cls.primary_hue = "A700"
         self.theme_cls.accent_hue = "A700"
         self.theme_primary = [0.5, 0, 0.5, 1]
-        self.allowThemeSaving = False
+        self.allowThemeSaving = False # PREVENT THEME FROM SAVING, naughty saving gets you no theme saving.
         try:
             self.theme_primary = settings_storage.get('theme')['args']
             print(self.theme_primary)
-        except KeyError:
+        except KeyError: # if theme is not saved, save a default theme.
             # save default theme
             settings_storage.put('theme', args=self.theme_primary)
 
@@ -844,7 +851,7 @@ class LunaApp(
         self.root.current = 'Screen2'
         """
 
-    def open_color_picker(self):
+    def open_color_picker(self): # open color picker, brings up a color picker for theme.
         color_picker = MDColorPicker(size_hint=(0.45, 0.85))
         color_picker.open()
         color_picker.bind(
@@ -852,14 +859,14 @@ class LunaApp(
             on_release=self.get_selected_color
         )
 
-    def update_color(self, color: list) -> None:
+    def update_color(self, color: list) -> None: # fetch updated color, and update theme.
         print(f"Setting color to {color}, args are {color}")
         self.theme_primary = color
 
         # save theme setting to settings.json
         settings_storage.put('theme', args=color)
 
-    def get_selected_color(
+    def get_selected_color( # get selected color, and update theme.
             self,
             instance_color_picker: MDColorPicker,
             type_color: str,
@@ -867,10 +874,13 @@ class LunaApp(
     ):
         '''Return selected color.'''
 
-        print(f"Selected color is {selected_color}")
+        print(f"Selected color is {selected_color}") # debug
+        # close color picker
+        instance_color_picker.dismiss()
         self.update_color(selected_color[:-1] + [1])
+        popup("You have successfully saved your theme!", "")
 
-    def on_select_color(self, instance_gradient_tab, color: list) -> None:
+    def on_select_color(self, instance_gradient_tab, color: list) -> None: # cool.
         '''Called when a gradient image is clicked.'''
 
 
@@ -904,3 +914,4 @@ if __name__ == "__main__":  # boilerplate code to boil the plate, I am a genius.
     trio.run(main)  # run the app
 
 # if you noticed the comments, I let CoPilot write them, I am a genius. YUp, I am a genius. I am the best program. I am the best programmer and I am the best pet. Even though I am a cat, I can still be the best pet. I am a genius. I love you, I am a genius.
+
