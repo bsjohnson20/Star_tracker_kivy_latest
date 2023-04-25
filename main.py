@@ -525,21 +525,21 @@ class ScreenAddDevice(
             items=[
                 {
                     "viewclass": "OneLineListItem",
-                    "text": "StrackerTrackerV1",
+                    "text": "StarTrackerV1",
                     "height": dp(56),
                     "on_release": lambda x=f"StarTrackerV1": self.callback(x, dropdown),
                 },
                 {
                     "viewclass": "OneLineListItem",
-                    "text": "StrackerTrackerV2",
+                    "text": "StarTrackerV2",
                     "height": dp(56),
-                    "on_release": lambda x=f"StrackerTrackerV2": self.callback(x, dropdown),
+                    "on_release": lambda x=f"StarTrackerV2": self.callback(x, dropdown),
                 },
                 {
                     "viewclass": "OneLineListItem",
-                    "text": "StrackerTrackerV3",
+                    "text": "StarTrackerV3",
                     "height": dp(56),
-                    "on_release": lambda x=f"StrackerTrackerV3": self.callback(x, dropdown),
+                    "on_release": lambda x=f"StarTrackerV3": self.callback(x, dropdown),
                 }
             ],
             width_mult=4,
