@@ -115,7 +115,6 @@ class IOT_toolbar(BoxLayout):  # toolbar, used for making the toolbar. Make it e
         # set screen to DeviceSettings
         # self.parent.parent.parent.manager.current = "DeviceSettings"
 
-
 # DeviceSettings page
 class DeviceSettings(
     Screen):  # settings, used making settings, and having too many settings, and making the user explode because they have too many settings.
@@ -134,13 +133,6 @@ class DeviceSettings(
     def on_enter(self, *args):
         # fetch name, desc, ip from IOT_screen
         print("LOADED IOTSCREEN_ENTER COMMAND?")
-        # use fetchValues to get the values from the IOT_screen
-
-        # below line is not working fuck me
-        # name, dev_type, ip, desc = fetchvalues()
-
-        # update StringProperties
-
         # log values
         print(f"Name: {self.dev_name}")
         print(f"Desc: {self.desc}")
@@ -326,8 +318,6 @@ class ScreenIOTControl(Screen):  # screen for controlling IOT devices
 
         # clear the boxlayout
         self.ids.iotcontrol_box.clear_widgets()
-        # clear toolbar
-        # don't do this self.ids.toolbar_box.clear_widgets()
 
         # create boxlayout
         box = BoxLayout(orientation="vertical", spacing=10, padding=10, size_hint=(1, 1))  # boxes are cool
@@ -505,7 +495,7 @@ class ValidatingTool:  # useful but useless inheritance, equal to 0 dollars.
             return False
 
     def checkDevType(self, dev_type):  # check if device type is valid
-        if dev_type == "Device Types":
+        if dev_type == "Device Types" or "star" not in dev_type:
             return False
         else:
             return True  # return true if valid
@@ -738,14 +728,7 @@ class ToolBar(BoxLayout):
         # Canvas
         print(f"ids: {self.ids}")
         add_to = self
-        # bind size and position to update rectangle
 
-        # update size on window resize
-        # add padding to half the width of root screen
-
-    # function to update size on resize
-
-    # function to update size on resize
 
 
 def changeScreenMe(*args, **kwargs):  # change screen to ScreenAboutMe, because I can. I am a genius.
@@ -892,19 +875,6 @@ class LunaApp(
 
     def on_select_color(self, instance_gradient_tab, color: list) -> None: # cool.
         '''Called when a gradient image is clicked.'''
-
-
-# defunct code
-# set color
-# def set_color(self, color, *args):
-#   if self.allowThemeSaving:
-#      print(f"Setting color to {color}, args are {args}")
-#     self.theme_primary = args
-#
-#           # save theme setting to settings.json
-#          settings_storage.put('theme', args=args[0])
-#     else: # we shouldn't be saving the theme yet
-#        print("Attempted to save theme, but not allowed to save theme yet")
 
 
 class ScreenCredits(Screen):  # I am the absolute best, I am a god, and I am a genius.
