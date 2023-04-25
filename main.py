@@ -115,7 +115,6 @@ class IOT_toolbar(BoxLayout):  # toolbar, used for making the toolbar. Make it e
         # set screen to DeviceSettings
         # self.parent.parent.parent.manager.current = "DeviceSettings"
 
-
 # DeviceSettings page
 class DeviceSettings(
     Screen):  # settings, used making settings, and having too many settings, and making the user explode because they have too many settings.
@@ -134,22 +133,24 @@ class DeviceSettings(
     def on_enter(self, *args):
         # fetch name, desc, ip from IOT_screen
         print("LOADED IOTSCREEN_ENTER COMMAND?")
-        # use fetchValues to get the values from the IOT_screen
-
-        # below line is not working fuck me
-        # name, dev_type, ip, desc = fetchvalues()
-
-        # update StringProperties
-
         # log values
         print(f"Name: {self.dev_name}")
         print(f"Desc: {self.desc}")
         print(f"IP: {self.ip}")
 
-    def save(self, dev_name, ip, desc):
+    def save(self, dev_name_old,dev_name, ip, desc):
         new_ip = ip
         new_name = dev_name
         new_desc = desc
+        # check if name exists in database:
+        print("test")
+        # checks if the device to change is the same as the one wanting to change is the same
+        print(f"new_ip: {new_ip}\n"
+              f"new_name: {dev_name}\n"
+              f"new_desc: {desc}\n"
+              f"ip: {ip}\n"
+              f"dev_name: {dev_name_old}\n")
+
 
         # validate using ValidatingTool
         if not ValidatingTool.checkIP(self, ip=new_ip):
@@ -162,11 +163,12 @@ class DeviceSettings(
             # summon popup
             popup("Invalid Name", "Please ensure all fields are filled")
 
-        # check if name exists in database:
-        print("test")
-        if not(dev_name in devices_storage) or (new_name in devices_storage): # checks if it already exists, if it's the one stored then allow, if it's changing into one in there then don't allow.
-            print("Device already in database\n choose a new name")
-            popup("Already in database\n choose a new name")
+        # check if name exists in database - if it does and it's the same one using old_name then it's fine, else it's not
+        # print an error if it's not
+        elif new_name in devices_storage.keys() and new_name != dev_name_old:
+            print("Name already exists")
+            # summon popup
+            popup("Name already exists", "Please enter a different name")
 
 
         else:
@@ -218,10 +220,10 @@ class OnlineCheck():  # I want to use Kivy's builtin function, but I haven't imp
         response = os.system("ping -n 1 " + self.url)
         # and then check the response...
         if response == 0:
-            self.status = "online"
+            self.status = "Online"
             return True
         else:
-            self.status = "offline"
+            self.status = "Offline"
             return False
 
 
@@ -242,10 +244,10 @@ class onlineButton(MDIconButton):  # button to check if online
                      ip):
         # check if online
         if OnlineCheck(ip, 5000).is_online():
-            self.parent.ids["status"].text = "online"
+            self.parent.ids["status"].text = "Online"
             Logger.info("online")
         else:
-            self.parent.ids["status"].text = "offline"
+            self.parent.ids["status"].text = "Online"
             Logger.info("offline")
 
 
@@ -316,8 +318,6 @@ class ScreenIOTControl(Screen):  # screen for controlling IOT devices
 
         # clear the boxlayout
         self.ids.iotcontrol_box.clear_widgets()
-        # clear toolbar
-        # don't do this self.ids.toolbar_box.clear_widgets()
 
         # create boxlayout
         box = BoxLayout(orientation="vertical", spacing=10, padding=10, size_hint=(1, 1))  # boxes are cool
@@ -495,7 +495,7 @@ class ValidatingTool:  # useful but useless inheritance, equal to 0 dollars.
             return False
 
     def checkDevType(self, dev_type):  # check if device type is valid
-        if dev_type == "Device Types":
+        if dev_type == "Device Types" or "star" not in dev_type:
             return False
         else:
             return True  # return true if valid
@@ -728,14 +728,7 @@ class ToolBar(BoxLayout):
         # Canvas
         print(f"ids: {self.ids}")
         add_to = self
-        # bind size and position to update rectangle
 
-        # update size on window resize
-        # add padding to half the width of root screen
-
-    # function to update size on resize
-
-    # function to update size on resize
 
 
 def changeScreenMe(*args, **kwargs):  # change screen to ScreenAboutMe, because I can. I am a genius.
@@ -882,19 +875,6 @@ class LunaApp(
 
     def on_select_color(self, instance_gradient_tab, color: list) -> None: # cool.
         '''Called when a gradient image is clicked.'''
-
-
-# defunct code
-# set color
-# def set_color(self, color, *args):
-#   if self.allowThemeSaving:
-#      print(f"Setting color to {color}, args are {args}")
-#     self.theme_primary = args
-#
-#           # save theme setting to settings.json
-#          settings_storage.put('theme', args=args[0])
-#     else: # we shouldn't be saving the theme yet
-#        print("Attempted to save theme, but not allowed to save theme yet")
 
 
 class ScreenCredits(Screen):  # I am the absolute best, I am a god, and I am a genius.

@@ -477,7 +477,7 @@
                 icon: "content-save"
                 on_release:
                     # fetch ids for text inputs
-                    root.save(dev_name=self.parent.parent.parent.ids.nameInput.text, desc=self.parent.parent.parent.ids.descInput.text, ip=self.parent.parent.parent.ids.ipInput.text)
+                    root.save(dev_name_old=root.dev_name,dev_name=self.parent.parent.parent.ids.nameInput.text, desc=self.parent.parent.parent.ids.descInput.text, ip=self.parent.parent.parent.ids.ipInput.text)
                     print(app.root.ids.screen_Home_id.setup())
 
 
