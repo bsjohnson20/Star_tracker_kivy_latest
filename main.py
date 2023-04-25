@@ -495,7 +495,7 @@ class ValidatingTool:  # useful but useless inheritance, equal to 0 dollars.
             return False
 
     def checkDevType(self, dev_type):  # check if device type is valid
-        if dev_type == "Device Types" or "star" not in dev_type:
+        if (dev_type == "Device Types") or ("Star" not in dev_type):
             return False
         else:
             return True  # return true if valid
