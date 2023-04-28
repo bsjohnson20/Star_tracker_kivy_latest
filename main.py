@@ -1,10 +1,10 @@
+
 # version 1.0.0
 
 
 import os
 import threading  # look at how many threads are running, if too many, just add more. Make user explode.
 from typing import Union
-
 
 import trio
 from kivy.app import App  # the beloved app
@@ -15,7 +15,7 @@ from kivy.metrics import \
 # 4 pixels on a 640 dpi screen, and so on. Unfortunately, this is not the case for all devices, so you have to use the
 # kivy.metrics module to get the correct scaling. cry
 from kivy.network.urlrequest import UrlRequest
-from kivy.properties import ObjectProperty, BooleanProperty, ListProperty, NumericProperty
+from kivy.properties import ObjectProperty, BooleanProperty, ListProperty
 from kivy.properties import StringProperty  # string property, used for storing strings
 from kivy.storage.jsonstore import JsonStore  # use for storing data
 from kivy.uix.boxlayout import BoxLayout  # box layout, used for making boxes
@@ -89,12 +89,14 @@ class IOT_toolbar(BoxLayout):  # toolbar, used for making the toolbar. Make it e
         # create controls
         back = MDIconButton(text="back", on_press=self.back, icon="arrow-left")
         back.size_hint = (0.3, 1)
-
+        DoesNothing = MDIconButton(text="DoesNothing", on_press=lambda x: print("!"), icon="home")
+        DoesNothing.size_hint = (0.3, 1)
         Settings = MDIconButton(icon="cog", on_press=self.settings)
         Settings.size_hint = (0.3, 1)
 
         # add controls to box
         box.add_widget(back)
+        box.add_widget(DoesNothing)
         box.add_widget(Settings)
 
         # log using logging module
@@ -642,15 +644,13 @@ class ScreenHome(Screen):
                       add_grid.children]:  # clear screen - this lets us update the screen as well! - no this isn't a lazy workaround so I don't have to append instead... and write a new builder
             add_grid.remove_widget(child)
         print(devices_storage.count())
-        count=0
         for item in devices_storage:
             print(item)
-            count+=1
             new = codeinpain(item, devices_storage[item]['device_type'])
             add_grid.parent.item = item
 
             # create THE Box this'll contain labels and the buton to open the corresponding IOT panel
-            Box = DeviceCard(count=count,dev_name=item, ip=devices_storage[item]['ip'], desc=devices_storage[item]['desc'],
+            Box = DeviceCard(dev_name=item, ip=devices_storage[item]['ip'], desc=devices_storage[item]['desc'],
                              device=devices_storage[item]['device_type'])
             # add color to Box
             # make it pretty
@@ -688,15 +688,13 @@ class DeviceCard(
     device = StringProperty()
     ip = StringProperty()
     desc = StringProperty()
-    count = NumericProperty()
 
-    def __init__(self, dev_name, ip, desc, device,count, **kwargs):
+    def __init__(self, dev_name, ip, desc, device, **kwargs):
         super().__init__(**kwargs)
         self.dev_name = dev_name
         self.device = device
         self.ip = ip
         self.desc = desc
-        self.count = count
         self.on_release = lambda: App.get_running_app().root.ids.screen_IOTControl_id.loadPage(dev_name,
                                                                                                devices_storage[
                                                                                                    dev_name][
