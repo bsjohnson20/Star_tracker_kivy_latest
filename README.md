@@ -8,4 +8,4 @@ Generates a list of registered devices using a dictionary stored in devices.json
 Each device will have it's own control setup depending on whether it's a v1, v2 or v3 etc.
 Has a button panel to tell a device to step forward, back or stop. As well as having a speed slider which is a percentage.
 Able to add a device, change the device's theme using kivymds colour picker widget.
-Can check whether a device is online by pinging the device, though this doesn't seem to work on android, though I'm not sure.
+Can check whether a device is online by pinging the device.
