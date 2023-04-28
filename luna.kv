@@ -154,7 +154,7 @@
                 root.manager.last_screen = 'ScreenWelcome'
         AsyncImage:
             # source is Princess_Luna_Remul-Lemlem_personaluse_fairuse.png
-            source: "Princess_Luna_Remul-Lemlem_personaluse_fairuse.png"
+            source: "images (1).jpg"
         MDRaisedButton:
             halign: 'center'
             size_hint_y: 0.1
@@ -261,7 +261,7 @@
 
             # call TitleLabel class and set text to "Home"
             TitleLabel:
-                text: "Home"
+                text: "Devices Command Centre"
                 halign:"center"
             # Cards go here - build a generator for them...
             ScrollView:
@@ -315,15 +315,9 @@
                     size_hint_y: None
                     text_size: self.width, None
                     height: self.texture_size[1]
-                MDIcon:
-                    pos_hint: {"center_x": .5, "center_y": .5}
-                    icon: "lightbulb-on"
-                    halign: "center"
+                MDLabel:
+                    text: "Device"+str(root.count)
                     size_hint_x: 0.1
-                    # set size to change with the screen
-                    size: self.texture_size
-                    # set the size of the icon to be the same as the text
-                    font_size: self.height * 1
 
 
 
@@ -362,6 +356,7 @@
                 dev_name: root.dev_name
                 desc: root.desc
                 ip: root.ip
+                size_hint_y:0.05
 
 
 
